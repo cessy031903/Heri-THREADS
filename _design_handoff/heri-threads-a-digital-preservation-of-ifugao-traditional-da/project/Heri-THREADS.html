@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heri-THREADS — Ifugao Cultural Archive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    /* ── FONT DEFINITION ─────────────────────────────────────── */
+    @font-face {
+      font-family: 'BBT Pamumundok';
+      src: local('BBT Pamumundok'), local('BBTPamumundok');
+      font-weight: 100 900;
+      font-style: normal italic;
+    }
+    /* ── TOKENS ──────────────────────────────────────────────── */
+    :root {
+      --gold: #D4A574; --gold-dark: #B8925D; --gold-light: #EDD5B0;
+      --orange: #C85A17; --green: #2D5016; --green-light: #4A7A2A;
+      --brown: #6B4423; --cream: #F5E6D3; --tan: #E8D5C4;
+      --charcoal: #2C2C2C; --gray: #6A6A6A; --white: #FFFFFF;
+      /* typography */
+      --font-display: 'BBT Pamumundok', 'Cormorant Garamond', 'IM Fell English', Georgia, serif;
+      --font-body: 'Lora', Georgia, serif;
+      --font-serif: var(--font-display);
+      --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+      /* bento */
+      --bento-gap: 10px;
+      --bento-radius: 14px;
+      --bento-border: rgba(212,165,116,.14);
+      --cell-bg: rgba(255,255,255,.97);
+      --cell-bg-dark: #13100C;
+      --sh-sm: 0 2px 8px rgba(44,44,44,.08);
+      --sh-md: 0 4px 20px rgba(44,44,44,.12);
+      --sh-lg: 0 12px 48px rgba(44,44,44,.16);
+      --sh-xl: 0 24px 80px rgba(44,44,44,.22);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans); color: var(--charcoal);
+      background: var(--white); line-height: 1.6;
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    *:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 3px; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--cream); }
+    ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+    /* ── ANIMATIONS ──────────────────────────────────────────── */
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(22px) } to { opacity:1; transform:none } }
+    @keyframes fadeIn   { from { opacity:0 } to { opacity:1 } }
+    @keyframes scaleIn  { from { opacity:0; transform:scale(.95) translateY(6px) } to { opacity:1; transform:none } }
+    @keyframes shimmer  { from { background-position:-200% center } to { background-position:200% center } }
+    @keyframes pulseRing{ 0%,100%{ transform:translate(-50%,-50%) scale(1); opacity:.7 } 60%{ transform:translate(-50%,-50%) scale(1.7); opacity:0 } }
+    @keyframes borderAnim{ from{background-position:0 0} to{background-position:200px 0} }
+    .anim-fade-up  { animation: fadeUp .55s cubic-bezier(.22,1,.36,1) both; }
+    .anim-scale-in { animation: scaleIn .28s cubic-bezier(.22,1,.36,1) both; }
+
+    /* ── TEXTILE PATTERN ─────────────────────────────────────── */
+    .textile-bg {
+      background-color: var(--cream);
+      background-image:
+        repeating-linear-gradient(45deg,rgba(212,165,116,.07) 0,rgba(212,165,116,.07) 1px,transparent 0,transparent 50%),
+        repeating-linear-gradient(-45deg,rgba(107,68,35,.045) 0,rgba(107,68,35,.045) 1px,transparent 0,transparent 50%);
+      background-size: 14px 14px;
+    }
+
+    /* ── ANIMATED DIAMOND BORDER ─────────────────────────────── */
+    .diamond-border {
+      height: 10px; overflow: hidden;
+      background: linear-gradient(90deg,#D4A574,#C85A17,#6B4423,#D4A574,#2D5016,#D4A574);
+      background-size: 300px;
+      animation: borderAnim 6s linear infinite;
+      opacity: .85;
+    }
+
+    /* ── HEADER ──────────────────────────────────────────────── */
+    .hdr {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(245,230,211,.96); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--tan);
+      height: 70px; display: flex; align-items: center;
+      padding: 0 2rem; gap: 1.5rem;
+      transition: box-shadow 250ms;
+    }
+    .hdr.scrolled { box-shadow: 0 2px 24px rgba(44,44,44,.12); }
+    .hdr-logo {
+      font-family: var(--font-serif); font-size: 1.125rem; font-weight: 700;
+      color: var(--charcoal); background: none; border: none; cursor: pointer;
+      letter-spacing: -.01em; display: flex; align-items: center; gap: .35rem;
+      white-space: nowrap; padding: 0;
+    }
+    .hdr-logo .gem { color: var(--gold); font-size: 1rem; }
+    .hdr-nav { display: flex; gap: .125rem; flex: 1; justify-content: center; }
+    .nav-btn {
+      font-family: var(--font-sans); font-size: .875rem; font-weight: 500;
+      color: var(--charcoal); background: none; border: none; cursor: pointer;
+      padding: .5rem 1.125rem; border-radius: .5rem; transition: color 150ms, background 150ms;
+      white-space: nowrap; position: relative;
+    }
+    .nav-btn:hover { color: var(--gold); background: rgba(212,165,116,.12); }
+    .nav-btn.active { color: var(--brown); font-weight: 700; }
+    .nav-btn.active::after {
+      content:''; position:absolute; bottom:4px; left:50%; transform:translateX(-50%);
+      width:20px; height:2px; background:var(--gold); border-radius:2px;
+    }
+    .lang-sw { display: flex; gap: .25rem; }
+    .lang-btn {
+      font-size: .7rem; font-weight: 700; padding: .3rem .75rem; border-radius: 2rem;
+      border: 1.5px solid var(--tan); background: none; cursor: pointer;
+      color: var(--gray); transition: all 150ms; letter-spacing: .04em;
+    }
+    .lang-btn.active { background: var(--gold); border-color: var(--gold); color: white; }
+    @media(max-width:640px){
+      .hdr-nav { display: none; }
+      .hdr { padding: 0 1rem; }
+    }
+
+    /* ── HERO ────────────────────────────────────────────────── */
+    .page-hero { padding: 4rem 2rem 3rem; text-align: center; max-width: 720px; margin: 0 auto; }
+    .hero-eyebrow {
+      font-size: .6875rem; font-weight: 700; letter-spacing: .18em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 1rem;
+      display: flex; align-items: center; justify-content: center; gap: .625rem;
+    }
+    .hero-eyebrow::before, .hero-eyebrow::after {
+      content:''; flex:1; max-width:48px; height:1px; background:var(--gold-light);
+    }
+    .hero-title {
+      font-family: var(--font-serif); font-size: clamp(2rem,5.5vw,3.25rem);
+      font-weight: 700; color: var(--charcoal); line-height: 1.18; margin-bottom: 1.25rem;
+    }
+    .hero-sub { font-size: .9375rem; color: var(--gray); max-width: 500px; margin: 0 auto; line-height: 1.75; }
+    .accent-line {
+      width: 52px; height: 3px; margin: 1.25rem auto;
+      background: linear-gradient(90deg, var(--gold), var(--orange));
+      border-radius: 2px;
+    }
+
+    /* ── DANCE GRID ──────────────────────────────────────────── */
+    .dance-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 1.5rem; padding: 0 2rem 5rem; max-width: 1200px; margin: 0 auto;
+    }
+    @media(max-width:1024px){ .dance-grid { grid-template-columns: repeat(2,1fr); } }
+    @media(max-width:640px)  { .dance-grid { grid-template-columns: 1fr; padding: 0 1rem 3.5rem; } }
+
+    .dance-card {
+      background: var(--white); border-radius: 1rem; overflow: hidden;
+      border: 1px solid var(--tan); cursor: pointer;
+      transition: transform 220ms cubic-bezier(.22,1,.36,1), box-shadow 220ms, border-color 220ms;
+    }
+    .dance-card:hover {
+      transform: translateY(-7px) scale(1.005);
+      box-shadow: var(--sh-lg); border-color: var(--gold-light);
+    }
+    .dc-img { position: relative; aspect-ratio: 4/3; overflow: hidden; }
+    .dc-body { padding: 1.25rem 1.5rem 1.5rem; }
+    .dc-name { font-family: var(--font-serif); font-size: 1.25rem; font-weight: 700; color: var(--charcoal); margin: .625rem 0 .375rem; }
+    .dc-snippet { font-size: .875rem; color: var(--gray); line-height: 1.65; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .dc-cta { font-size: .8rem; font-weight: 700; color: var(--gold); margin-top: 1rem; display: inline-flex; align-items: center; gap: .3rem; letter-spacing: .04em; text-transform: uppercase; }
+    .dc-cta:hover { color: var(--orange); }
+
+    /* ── BADGE ───────────────────────────────────────────────── */
+    .badge { display: inline-block; padding: .2rem .7rem; border-radius: 2rem; font-size: .65rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: white; }
+    .b-pagaddut { background: var(--gold); }
+    .b-hinggatut { background: var(--green); }
+    .b-dinuya    { background: var(--orange); }
+
+    /* ── MODAL ───────────────────────────────────────────────── */
+    .modal-ov {
+      position: fixed; inset: 0; z-index: 1000; display: flex;
+      align-items: center; justify-content: center; padding: 1rem;
+      background: rgba(20,10,5,.78);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      animation: fadeIn .2s ease;
+    }
+    .modal-box {
+      background: var(--white); border-radius: 1.125rem;
+      width: 100%; max-width: 700px; max-height: 92vh; overflow-y: auto;
+      box-shadow: var(--sh-xl); position: relative;
+      animation: scaleIn .28s cubic-bezier(.22,1,.36,1);
+    }
+    .modal-img { width: 100%; aspect-ratio: 16/9; overflow: hidden; position: relative; }
+    .modal-body { padding: 1.75rem 2rem 2.25rem; }
+    .modal-name { font-family: var(--font-serif); font-size: 2rem; font-weight: 700; color: var(--charcoal); margin: .625rem 0 .75rem; }
+    .modal-desc { font-size: .9375rem; color: var(--gray); line-height: 1.8; margin-bottom: 1.5rem; }
+    .modal-vid-label { font-size: .7rem; font-weight: 700; color: var(--gold); letter-spacing: .12em; text-transform: uppercase; margin-bottom: .75rem; }
+    .vid-wrap { border-radius: .75rem; overflow: hidden; aspect-ratio: 16/9; background: #111; }
+    .vid-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+    .close-btn {
+      position: absolute; top: .875rem; right: .875rem;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,.92); border: 1px solid rgba(0,0,0,.1);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; color: var(--charcoal); transition: background 150ms, transform 150ms;
+      z-index: 10; box-shadow: var(--sh-sm);
+    }
+    .close-btn:hover { background: var(--cream); transform: scale(1.08); }
+
+    /* ── MUNICIPALITY GRID ───────────────────────────────────── */
+    .mun-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 1.5rem; padding: 0 2rem 5rem; max-width: 1200px; margin: 0 auto;
+    }
+    @media(max-width:1024px){ .mun-grid { grid-template-columns: repeat(2,1fr); } }
+    @media(max-width:640px)  { .mun-grid { grid-template-columns: 1fr; padding: 0 1rem 3.5rem; } }
+
+    .mun-card {
+      background: var(--white); border-radius: 1rem; overflow: hidden;
+      border: 1px solid var(--tan); cursor: pointer;
+      transition: transform 220ms cubic-bezier(.22,1,.36,1), box-shadow 220ms;
+    }
+    .mun-card:hover { transform: translateY(-6px); box-shadow: var(--sh-lg); }
+    .mun-visual { aspect-ratio: 3/2; position: relative; overflow: hidden; }
+    .mun-body { padding: 1.125rem 1.5rem 1.375rem; }
+    .mun-name { font-family: var(--font-serif); font-size: 1.25rem; font-weight: 700; color: var(--charcoal); margin-bottom: .2rem; }
+    .mun-tag  { font-size: .8125rem; color: var(--gray); }
+    .mun-cta  { font-size: .78rem; font-weight: 700; color: var(--gold); margin-top: .6rem; display: inline-flex; align-items: center; gap: .3rem; letter-spacing: .04em; text-transform: uppercase; }
+
+    /* ── ATTIRE SECTIONS ─────────────────────────────────────── */
+    .attires-wrap { max-width: 1100px; margin: 0 auto; padding: 2rem 2rem 5rem; }
+    @media(max-width:640px){ .attires-wrap { padding: 1.5rem 1rem 3rem; } }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      padding: .6rem 1.25rem; border-radius: .5rem;
+      border: 1.5px solid var(--gold); background: transparent;
+      color: var(--brown); font-weight: 600; font-size: .875rem;
+      cursor: pointer; transition: background 150ms, color 150ms; margin-bottom: 2.25rem;
+    }
+    .back-btn:hover { background: var(--gold); color: white; }
+    .sec-head { font-family: var(--font-serif); font-size: 1.375rem; font-weight: 600; color: var(--charcoal); }
+    .sec-line { width: 44px; height: 3px; margin: .5rem 0 1.375rem; background: linear-gradient(90deg,var(--gold),var(--orange)); border-radius: 2px; }
+    .attire-section { margin-bottom: 3rem; }
+    .attire-card {
+      background: var(--white); border-radius: 1rem; border: 1px solid var(--tan);
+      overflow: hidden; display: grid; grid-template-columns: 260px 1fr;
+      min-height: 220px; margin-bottom: 1.5rem;
+      transition: box-shadow 200ms; animation: fadeUp .45s cubic-bezier(.22,1,.36,1) both;
+    }
+    .attire-card:hover { box-shadow: var(--sh-md); }
+    @media(max-width:768px){ .attire-card { grid-template-columns: 1fr; } }
+    .att-img { overflow: hidden; position: relative; }
+    .att-body { padding: 1.5rem 1.75rem; display: flex; flex-direction: column; justify-content: center; }
+    .att-title { font-family: var(--font-serif); font-size: 1.1875rem; font-weight: 700; color: var(--charcoal); margin-bottom: .2rem; }
+    .att-dialect { font-style: italic; color: var(--gold); font-size: .875rem; margin-bottom: .875rem; }
+    .att-desc { font-size: .875rem; color: var(--gray); line-height: 1.78; margin-bottom: .75rem; }
+    .att-src { font-size: .73rem; color: var(--gray); font-style: italic; }
+    .empty-state { text-align: center; padding: 2.5rem; color: var(--gray); font-style: italic; border: 1.5px dashed var(--tan); border-radius: 1rem; font-size: .9rem; }
+
+    /* ── PAIRED PHOTO / HOTSPOTS ─────────────────────────────── */
+    .paired-wrap { border-radius: 1rem; overflow: hidden; position: relative; }
+    .hs-dot {
+      position: absolute; transform: translate(-50%,-50%);
+      width: 44px; height: 44px; cursor: pointer; z-index: 10;
+    }
+    .hs-ring {
+      position: absolute; top: 50%; left: 50%;
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 2px solid rgba(212,165,116,.65);
+      animation: pulseRing 2.4s ease-in-out infinite;
+    }
+    .hs-inner {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 26px; height: 26px; border-radius: 50%;
+      background: rgba(212,165,116,.92); border: 2px solid white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .65rem; font-weight: 800; color: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,.35);
+      transition: background 150ms, transform 150ms;
+    }
+    .hs-dot:hover .hs-inner, .hs-dot.active .hs-inner {
+      background: var(--orange); transform: translate(-50%,-50%) scale(1.18);
+    }
+    .hs-tooltip {
+      position: absolute; background: var(--charcoal); color: white;
+      padding: .7rem .9rem; border-radius: .5rem;
+      width: 210px; font-size: .78125rem; line-height: 1.55;
+      z-index: 20; pointer-events: none;
+      box-shadow: 0 6px 24px rgba(0,0,0,.35);
+      animation: fadeIn .12s ease;
+    }
+    .hs-tt-name { font-weight: 700; color: var(--gold-light); margin-bottom: .25rem; font-size: .8125rem; }
+    .hs-legend { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .875rem; }
+    .hs-legend-item { display: flex; align-items: center; gap: .35rem; font-size: .73rem; color: var(--gray); }
+    .hs-legend-dot { width: 18px; height: 18px; border-radius: 50%; background: var(--gold); color: white; display: flex; align-items: center; justify-content: center; font-size: .6rem; font-weight: 800; flex-shrink: 0; }
+
+    /* ── TWEAKS PANEL ────────────────────────────────────────── */
+    .tw-panel {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      background: white; border: 1px solid var(--tan);
+      border-radius: 1rem; padding: 1.25rem 1.375rem;
+      width: 238px; box-shadow: var(--sh-lg); z-index: 500;
+      animation: scaleIn .22s ease;
+    }
+    .tw-hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .tw-title { font-weight: 700; font-size: .875rem; color: var(--charcoal); font-family: var(--font-serif); }
+    .tw-close { background: none; border: none; cursor: pointer; color: var(--gray); font-size: .875rem; padding: 2px 4px; }
+    .tw-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: .75rem; font-size: .8rem; color: var(--gray); }
+    .tw-toggle { width: 38px; height: 20px; border-radius: 10px; background: var(--tan); border: none; cursor: pointer; position: relative; transition: background 200ms; }
+    .tw-toggle.on { background: var(--gold); }
+    .tw-toggle::after { content:''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: white; top: 3px; left: 3px; transition: transform 200ms; }
+    .tw-toggle.on::after { transform: translateX(18px); }
+    .tw-seg { display: flex; gap: 2px; }
+    .tw-seg button { font-size: .68rem; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--tan); cursor: pointer; transition: all 150ms; background: none; color: var(--gray); }
+    .tw-seg button.on { background: var(--gold); border-color: var(--gold); color: white; font-weight: 700; }
+
+    /* ── LANDING HERO ────────────────────────────────────────── */
+    @keyframes cellIn  { from{opacity:0;transform:scale(.97) translateY(10px)} to{opacity:1;transform:none} }
+    @keyframes floatY  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+    @keyframes scrollB { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+
+    .landing-hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+      background: #0C0907; position: relative; overflow: hidden; padding: 6rem 2rem 5rem;
+    }
+    .lh-bg-pattern {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        repeating-linear-gradient(45deg,rgba(212,165,116,.04) 0,rgba(212,165,116,.04) 1px,transparent 0,transparent 50%),
+        repeating-linear-gradient(-45deg,rgba(107,68,35,.03) 0,rgba(107,68,35,.03) 1px,transparent 0,transparent 50%);
+      background-size: 20px 20px;
+    }
+    .lh-glow {
+      position: absolute; width: 700px; height: 700px; border-radius: 50%;
+      background: radial-gradient(circle,rgba(212,165,116,.06) 0%,transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%,-58%); pointer-events: none;
+    }
+    .lh-eyebrow {
+      font-family: var(--font-sans); font-size: .625rem; font-weight: 700;
+      letter-spacing: .28em; text-transform: uppercase; color: var(--gold); opacity: .7;
+      margin-bottom: 1.75rem; display: flex; align-items: center; gap: .875rem;
+      animation: fadeUp .6s .05s cubic-bezier(.22,1,.36,1) both;
+    }
+    .lh-eyebrow::before, .lh-eyebrow::after {
+      content:''; flex-shrink:0; width:36px; height:1px;
+    }
+    .lh-eyebrow::before { background:linear-gradient(90deg,transparent,rgba(212,165,116,.5)); }
+    .lh-eyebrow::after  { background:linear-gradient(90deg,rgba(212,165,116,.5),transparent); }
+    .lh-title {
+      font-family: var(--font-display); font-size: clamp(4rem,10vw,9rem);
+      font-weight: 700; color: rgba(255,255,255,.93); line-height: .92;
+      letter-spacing: -.03em; position: relative; z-index: 1;
+      animation: fadeUp .7s cubic-bezier(.22,1,.36,1) both;
+    }
+    .lh-title .gem { color: var(--gold); font-style: italic; }
+    .lh-title .sub-line {
+      display: block; font-size: .38em; font-weight: 300; font-style: italic;
+      color: rgba(255,255,255,.35); letter-spacing: .01em; margin-top: .4em;
+    }
+    .lh-sub {
+      font-family: var(--font-body); font-style: italic;
+      font-size: clamp(.9375rem,1.4vw,1.0625rem); color: rgba(255,255,255,.35);
+      max-width: 440px; line-height: 1.85; margin: 1.75rem auto 2.75rem;
+      animation: fadeUp .7s .14s cubic-bezier(.22,1,.36,1) both;
+    }
+    .lh-actions {
+      display: flex; gap: .875rem; flex-wrap: wrap; justify-content: center;
+      animation: fadeUp .7s .22s cubic-bezier(.22,1,.36,1) both;
+    }
+    .lh-btn {
+      display: inline-flex; align-items: center; gap: .5rem; padding: .8125rem 2rem;
+      border-radius: 2rem; font-family: var(--font-sans); font-size: .8rem; font-weight: 700;
+      letter-spacing: .07em; text-transform: uppercase; cursor: pointer; border: none;
+      transition: all 220ms cubic-bezier(.22,1,.36,1);
+    }
+    .lh-btn-primary { background: var(--gold); color: #0C0907; }
+    .lh-btn-primary:hover { background: var(--gold-light); transform:translateY(-2px); box-shadow:0 8px 32px rgba(212,165,116,.3); }
+    .lh-btn-ghost { background: transparent; color: rgba(255,255,255,.6); border: 1.5px solid rgba(255,255,255,.12); }
+    .lh-btn-ghost:hover { border-color: rgba(212,165,116,.45); color: var(--gold); }
+    .lh-scroll {
+      position: absolute; bottom: 2.25rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: .4rem;
+      font-family: var(--font-sans); font-size: .55rem; letter-spacing: .2em;
+      text-transform: uppercase; color: rgba(255,255,255,.18);
+      animation: fadeIn 1s .9s ease both;
+    }
+    .lh-scroll-arrow { font-size: .8rem; animation: scrollB 2s ease-in-out infinite; }
+
+    /* ── BENTO GRID (below hero) ─────────────────────────────── */
+    .bento-wrap {
+      padding: 3rem 1.5rem 5rem; background: #0C0907;
+    }
+    .bento-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      grid-template-rows: 240px 220px;
+      gap: var(--bento-gap);
+      max-width: 1280px; margin: 0 auto;
+    }
+    @media(max-width:1100px){ .bento-grid { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4,200px); } }
+    @media(max-width:600px)  { .bento-grid { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(5,170px); } }
+
+    .b-cell {
+      border-radius: var(--bento-radius); border: 1px solid rgba(212,165,116,.09);
+      overflow: hidden; position: relative;
+      transition: border-color 260ms, box-shadow 260ms, transform 260ms cubic-bezier(.22,1,.36,1);
+      animation: cellIn .5s cubic-bezier(.22,1,.36,1) both;
+    }
+    .b-cell[role="button"]:hover {
+      border-color: rgba(212,165,116,.32);
+      box-shadow: 0 12px 48px rgba(0,0,0,.45);
+      transform: translateY(-3px); z-index: 2;
+    }
+
+    /* Row 1: dances | feat | s1 | s2 */
+    .b-dances { grid-column:1; grid-row:1; background:#111009; display:flex; flex-direction:column; justify-content:space-between; padding:1.5rem; cursor:pointer; }
+    .b-feat   { grid-column:2; grid-row:1; background:#1A1208; display:flex; flex-direction:column; justify-content:flex-end; padding:1.375rem; cursor:pointer; }
+    .b-s1     { grid-column:3; grid-row:1; background:#0F0F0B; display:flex; flex-direction:column; justify-content:space-between; padding:1.5rem; }
+    .b-s2     { grid-column:4; grid-row:1; background:var(--gold); display:flex; flex-direction:column; justify-content:space-between; padding:1.5rem; }
+
+    /* Row 2: quote | quote | attires | mun */
+    .b-quote   { grid-column:1/3; grid-row:2; background:#0E1109; padding:1.75rem 2rem; display:flex; flex-direction:column; justify-content:center; }
+    .b-attires { grid-column:3;   grid-row:2; background:#1A0E0C; display:flex; flex-direction:column; justify-content:space-between; padding:1.5rem; cursor:pointer; }
+    .b-mun     { grid-column:4;   grid-row:2; background:#100F0D; padding:1.375rem; display:flex; flex-direction:column; justify-content:space-between; }
+
+    .b-stat-num   { font-family:var(--font-display); font-size:clamp(2.5rem,4.5vw,4rem); font-weight:700; line-height:1; letter-spacing:-.03em; }
+    .b-stat-label { font-family:var(--font-sans); font-size:.625rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase; }
+    .b-s1 .b-stat-num { color:var(--gold); } .b-s1 .b-stat-label { color:rgba(255,255,255,.32); }
+    .b-s2 .b-stat-num { color:#0C0907; }     .b-s2 .b-stat-label { color:rgba(12,9,7,.52); }
+
+    .b-feat-label { font-family:var(--font-sans); font-size:.58rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); margin-bottom:.375rem; }
+    .b-feat-name  { font-family:var(--font-display); font-size:clamp(1.25rem,2.2vw,1.875rem); font-weight:700; color:rgba(255,255,255,.9); line-height:1.15; margin-bottom:.25rem; }
+    .b-feat-cat   { font-family:var(--font-body); font-style:italic; font-size:.75rem; color:rgba(212,165,116,.65); }
+
+    .b-cell-ico   { font-size:1.125rem; margin-bottom:.375rem; }
+    .b-cell-title { font-family:var(--font-display); font-size:clamp(1rem,1.7vw,1.375rem); font-weight:700; color:rgba(255,255,255,.88); line-height:1.2; }
+    .b-cell-sub   { font-family:var(--font-body); font-style:italic; font-size:.75rem; color:rgba(255,255,255,.32); margin-top:.25rem; line-height:1.5; }
+    .b-arrow      { font-size:.875rem; color:var(--gold); align-self:flex-end; transition:transform 200ms; }
+    .b-dances[role="button"]:hover .b-arrow,
+    .b-attires[role="button"]:hover .b-arrow { transform:translate(3px,-3px); }
+
+    .b-quote-mark { font-family:var(--font-display); font-size:3.25rem; font-weight:700; color:var(--gold); line-height:.7; opacity:.55; margin-bottom:.625rem; }
+    .b-quote-text { font-family:var(--font-body); font-style:italic; font-size:clamp(.875rem,1.25vw,1rem); color:rgba(255,255,255,.7); line-height:1.8; margin-bottom:.625rem; }
+    .b-quote-attr { font-family:var(--font-sans); font-size:.6rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:rgba(212,165,116,.45); }
+
+    .b-mun-list { display:flex; flex-direction:column; gap:.3rem; }
+    .b-mun-item {
+      font-family:var(--font-display); font-size:clamp(.75rem,1vw,.9rem);
+      color:rgba(255,255,255,.42); display:flex; align-items:center; gap:.5rem;
+      transition:color 150ms; cursor:pointer;
+    }
+    .b-mun-item::before { content:''; width:4px; height:4px; border-radius:50%; background:var(--gold); opacity:.45; flex-shrink:0; }
+    .b-mun-item:hover { color:rgba(255,255,255,.82); }
+
+    /* ── NEW DANCE CARDS ─────────────────────────────────────── */
+    .dance-grid-v2 {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 1.125rem;
+      padding: 0 2rem 5rem; max-width: 1200px; margin: 0 auto;
+    }
+    @media(max-width:1024px){ .dance-grid-v2 { grid-template-columns: repeat(2,1fr); } }
+    @media(max-width:600px)  { .dance-grid-v2 { grid-template-columns: 1fr; padding: 0 1rem 3.5rem; } }
+
+    .dance-card-v2 {
+      border-radius: 14px; overflow: hidden; cursor: pointer;
+      aspect-ratio: 3/4; position: relative;
+      border: 1px solid rgba(212,165,116,.08);
+      animation: cellIn .5s cubic-bezier(.22,1,.36,1) both;
+      transition: transform 260ms cubic-bezier(.22,1,.36,1), box-shadow 260ms, border-color 260ms;
+    }
+    .dance-card-v2:hover { transform:translateY(-6px) scale(1.01); box-shadow:0 24px 64px rgba(0,0,0,.55); border-color:rgba(212,165,116,.28); }
+    .dc2-wm {
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      font-family:var(--font-display); font-size:clamp(2.5rem,5vw,4rem); font-style:italic;
+      font-weight:700; color:rgba(255,255,255,.1); user-select:none; text-align:center; padding:1rem;
+      transition: color 300ms, transform 300ms;
+    }
+    .dance-card-v2:hover .dc2-wm { color:rgba(255,255,255,.06); transform:scale(1.05); }
+    .dc2-badge { position:absolute; top:14px; left:14px; z-index:3; }
+    .dc2-overlay {
+      position:absolute; bottom:0; left:0; right:0; padding:1.625rem 1.5rem 1.5rem;
+      background:linear-gradient(to top, rgba(10,7,4,.97) 0%, rgba(10,7,4,.88) 50%, transparent 100%);
+      transform:translateY(52%); transition:transform 340ms cubic-bezier(.22,1,.36,1);
+      z-index:4;
+    }
+    .dance-card-v2:hover .dc2-overlay { transform:translateY(0); }
+    .dc2-title { font-family:var(--font-display); font-size:1.25rem; font-weight:700; color:rgba(255,255,255,.92); margin-bottom:.375rem; line-height:1.15; }
+    .dc2-snip  { font-family:var(--font-body); font-style:italic; font-size:.8125rem; color:rgba(255,255,255,.5); line-height:1.65; margin-bottom:.75rem; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+    .dc2-link  { font-family:var(--font-sans); font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); display:flex; align-items:center; gap:.35rem; }
+
+    /* ── CATEGORY FILTER BAR ─────────────────────────────────── */
+    .cat-filter {
+      display:flex; gap:.375rem; padding:0 2rem 2rem; max-width:1200px; margin:0 auto;
+      overflow-x:auto; scrollbar-width:none;
+    }
+    .cat-filter::-webkit-scrollbar { display:none; }
+    .cat-pill {
+      font-family:var(--font-sans); font-size:.75rem; font-weight:700;
+      letter-spacing:.06em; text-transform:uppercase;
+      padding:.45rem 1.125rem; border-radius:2rem; cursor:pointer; border:none;
+      background: rgba(255,255,255,.06); color:rgba(255,255,255,.45);
+      transition:all 200ms; white-space:nowrap;
+    }
+    .cat-pill.active { background:var(--gold); color:#0C0907; }
+    .cat-pill:not(.active):hover { background:rgba(212,165,116,.15); color:rgba(255,255,255,.8); }
+
+    /* ── NEW MUNICIPALITY CARDS ──────────────────────────────── */
+    .mun-grid-v2 {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:1.125rem;
+      padding:0 2rem 5rem; max-width:1200px; margin:0 auto;
+    }
+    @media(max-width:1024px){ .mun-grid-v2 { grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:600px)  { .mun-grid-v2 { grid-template-columns:1fr; padding:0 1rem 3.5rem; } }
+
+    .mun-card-v2 {
+      border-radius:14px; overflow:hidden; cursor:pointer; aspect-ratio:4/3;
+      position:relative; border:1px solid rgba(212,165,116,.08);
+      animation:cellIn .5s cubic-bezier(.22,1,.36,1) both;
+      transition:transform 260ms cubic-bezier(.22,1,.36,1), box-shadow 260ms, border-color 260ms;
+    }
+    .mun-card-v2:hover { transform:translateY(-5px); box-shadow:0 20px 60px rgba(0,0,0,.5); border-color:rgba(212,165,116,.28); }
+    .mun2-content {
+      position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end; padding:1.75rem;
+      background:linear-gradient(to top, rgba(10,7,4,.92) 0%, transparent 60%);
+    }
+    .mun2-name { font-family:var(--font-display); font-size:clamp(1.5rem,2.8vw,2.125rem); font-weight:700; color:rgba(255,255,255,.92); line-height:1.1; margin-bottom:.25rem; }
+    .mun2-tag  { font-family:var(--font-body); font-style:italic; font-size:.8125rem; color:rgba(255,255,255,.38); margin-bottom:.875rem; opacity:0; transform:translateY(7px); transition:opacity 240ms 40ms, transform 240ms 40ms; }
+    .mun2-cta  { font-family:var(--font-sans); font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); display:flex; align-items:center; gap:.35rem; opacity:0; transition:opacity 200ms 80ms; }
+    .mun-card-v2:hover .mun2-tag, .mun-card-v2:hover .mun2-cta { opacity:1; transform:none; }
+
+    /* ── DARK MODE ───────────────────────────────────────────── */
+    body.dark {
+      background: #0C0907; color: #EDE0D0;
+      --white:#1E140A; --cream:#1A1208; --tan:#3C2D1C;
+      --charcoal:#EDE0D0; --gray:#A08870;
+      --cell-bg: #13100C;
+    }
+    body.dark .hdr { background: rgba(12,9,7,.97); border-color: rgba(212,165,116,.1); }
+    body.dark .hdr-logo { color: rgba(255,255,255,.9); }
+    body.dark .nav-btn { color: rgba(255,255,255,.65); }
+    body.dark .nav-btn:hover { color: var(--gold); background: rgba(212,165,116,.08); }
+    body.dark .nav-btn.active { color: var(--gold); }
+    body.dark .nav-btn.active::after { background: var(--gold); }
+    body.dark .lang-btn { border-color: rgba(255,255,255,.12); color: rgba(255,255,255,.4); }
+    body.dark .lang-btn.active { background: var(--gold); border-color: var(--gold); color: #0C0907; }
+    body.dark .dance-card, body.dark .mun-card, body.dark .attire-card { background: #1A1208; border-color: #2E2218; }
+    body.dark .modal-box { background: #1A1208; }
+    body.dark .tw-panel { background: #1A1208; border-color: #2E2218; color: rgba(255,255,255,.8); }
+    body.dark .tw-title { color: rgba(255,255,255,.9); }
+    body.dark .dc-name, body.dark .mun-name, body.dark .att-title { color: rgba(255,255,255,.9); }
+    body.dark .page-hero { color: rgba(255,255,255,.9); }
+    body.dark .hero-title { color: rgba(255,255,255,.92); }
+    body.dark .footer { background: #0C0907; border-color: rgba(212,165,116,.1); color: rgba(255,255,255,.3); }
+    body.dark .footer strong { color: rgba(255,255,255,.6); }
+    body.dark .textile-bg { background-color: #100D09; }
+    body.dark .attire-card { color: rgba(255,255,255,.8); }
+    body.dark .att-desc, body.dark .dc-snippet, body.dark .mun-tag { color: rgba(255,255,255,.4); }
+    body.dark .att-src { color: rgba(255,255,255,.3); }
+    body.dark .sec-head { color: rgba(255,255,255,.85); }
+    body.dark .modal-name { color: rgba(255,255,255,.9); }
+    body.dark .modal-desc { color: rgba(255,255,255,.55); }
+    body.dark .modal-box { color: rgba(255,255,255,.8); }
+    body.dark .back-btn { color: var(--gold); border-color: rgba(212,165,116,.35); }
+    body.dark .back-btn:hover { background: var(--gold); color: #0C0907; }
+    body.dark .empty-state { border-color: rgba(212,165,116,.15); color: rgba(255,255,255,.3); }
+
+    /* ── FOOTER ──────────────────────────────────────────────── */
+    .footer { text-align: center; padding: 2rem 1rem; font-size: .8rem; color: var(--gray); border-top: 1px solid var(--tan); background: var(--cream); }
+    .footer strong { font-family: var(--font-serif); color: var(--charcoal); }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script>
+    /* ── TWEAK DEFAULTS (owned by host for persistence) ──────── */
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "darkMode": true,
+      "language": "en",
+      "compactCards": false
+    }/*EDITMODE-END*/;
+
+    /* ── DANCE DATA ────────────────────────────────────────── */
+    const DANCES = [
+      { id:1, name:'Punnuk', cat:'Pagaddut', seed:1,
+        snippet:'A sacred courtship dance performed during the Uyauy feast, celebrating love, fertility, and the blessing of the harvest season.',
+        full:'The Punnuk is one of the most recognized Ifugao dances, performed during the prestigious Uyauy feast — a ceremony held by wealthy families to honor ancestral spirits. Young men and women circle together in graceful movements, their handwoven garments catching the highland breeze. The dance symbolizes the intertwining of life, love, and the earth\'s abundance, and is accompanied by the ringing of gangsa flat gongs.',
+        yt:'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+      { id:2, name:'Blit', cat:'Pagaddut', seed:2,
+        snippet:'A harvest thanksgiving dance where rice reapers celebrate the bounty of the terraced fields through rhythmic, joyful movements.',
+        full:'The Blit dance is performed by rice reapers at the end of harvest season, giving thanks to Bugan, the rice deity. Dancers move in synchronized rows, mimicking the swaying of ripe rice stalks on the mountain terraces. The geometric patterns of their handwoven garments mirror the step-terrace forms of the Ifugao landscape itself.',
+        yt:'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+      { id:3, name:'Uyauy', cat:'Hinggatut', seed:3,
+        snippet:'A powerful war dance performed by Ifugao warriors to commemorate victory in battle, featuring vigorous stomping and chanting.',
+        full:'The Uyauy war dance is a powerful expression of Ifugao warrior culture. Performed by men adorned in full battle regalia — headdresses of feathers, woven loincloths, and weapons of carved wood — the dance recounts heroic deeds and honors fallen warriors through vigorous stomping and rhythmic war cries that echo through the mountain valleys.',
+        yt:'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+      { id:4, name:'Bogwa', cat:'Hinggatut', seed:4,
+        snippet:'A solemn ceremonial dance performed during the secondary burial rite, honoring ancestors and guiding spirits to the afterlife.',
+        full:'The Bogwa is performed during the secondary burial ceremony, where the bones of the deceased are cleaned and rewrapped in new funeral cloth. This sacred dance is both a mourning ritual and a celebration — the community honors the spirit\'s journey to the realm of ancestors. Only elders and initiated members may perform certain movements, making it one of the most restricted of all Ifugao dances.',
+        yt:'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+      { id:5, name:'Dinuy-a', cat:'Dinuy-a', seed:5,
+        snippet:'A joyful peace dance performed to welcome allies and seal friendships between villages through communal celebration.',
+        full:'The Dinuy-a is the dance of welcome and peace, performed when neighboring villages come together to resolve conflicts or celebrate alliances. Both men and women participate, moving in interwoven circles that symbolize the binding of communities. The name itself reflects the spirit of the dance — open hands, open hearts, the weaving of new bonds between peoples.',
+        yt:'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+      { id:6, name:'Tayo', cat:'Dinuy-a', seed:6,
+        snippet:'A communal gathering dance where entire villages celebrate life, kinship, and shared Ifugao identity through slow, meditative steps.',
+        full:'Tayo means "let\'s dance together" in Ifugao, and this communal dance reflects the profound social bonds of highland society. Performed during village festivals and community gatherings, Tayo involves large circles of participants — young and old alike — moving in slow, meditative steps that speak of unity, continuity, and the unbreakable thread of belonging.',
+        yt:'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+    ];
+
+    /* ── MUNICIPALITY DATA ─────────────────────────────────── */
+    const MUNICIPALITIES = [
+      { name:'Banaue',    tagline:'Home of the Eighth Wonder', seed:10 },
+      { name:'Kiangan',   tagline:'Cradle of Ifugao Civilization', seed:20 },
+      { name:'Hungduan',  tagline:'Heart of Highland Tradition', seed:30 },
+      { name:'Lagawe',    tagline:'Provincial Capital of Ifugao', seed:40 },
+      { name:'Aguinaldo', tagline:'Where Traditions Breathe', seed:50 },
+    ];
+
+    /* ── ATTIRE DATA ───────────────────────────────────────── */
+    const ATTIRES = {
+      Banaue:{
+        women:[
+          {id:1,gen:'Wraparound Skirt',dia:'Tapis / Tolda',seed:11,
+           desc:'The Tapis is woven on a backstrap loom with intricate geometric patterns in deep red and black, secured at the waist with a hand-plaited belt. The patterns indicate the wearer\'s social standing and village of origin, with more elaborate designs reserved for elite families and high-ritual occasions.',
+           src:'National Museum of the Philippines, Ifugao Collection'},
+          {id:2,gen:'Ceremonial Blouse',dia:'Ampuyo',seed:12,
+           desc:'The Ampuyo is a hand-woven upper garment featuring a V-shaped collar and short sleeves, woven from locally grown cotton in earthy reds and ochres. Ceremonial versions include woven metallic thread accents along the hemline, worn only during the Uyauy feast.',
+           src:'Banaue Museum'},
+        ],
+        men:[
+          {id:3,gen:'Loincloth',dia:'Wanes',seed:13,
+           desc:'The Wanes is the traditional male garment — a long strip of woven cloth wrapped around the waist and passed between the legs. Considered sacred attire worn during rituals, feasts, and battles, its weaving patterns encode the warrior\'s accomplishments and family lineage across generations.',
+           src:'Ifugao State University Research Center'},
+          {id:4,gen:'Ceremonial Vest',dia:'Bangkuong',seed:14,
+           desc:'The Bangkuong is a sleeveless vest worn during ceremonial occasions, decorated with intricate geometric embroidery in contrasting thread. It marks the wearer as a participant in formal ritual. Elder men often wear the Bangkuong with additional shell and bead ornamentation.',
+           src:'National Commission for Culture and the Arts'},
+        ]
+      },
+      Kiangan:{
+        women:[
+          {id:5,gen:'Ceremonial Wrap Skirt',dia:'Gamit',seed:21,
+           desc:'The Gamit is unique to Kiangan, distinguished by its white base color with dense red geometric motifs. Traditionally worn during the Mompog ceremony, it is passed from mother to daughter as a sacred heirloom garment that carries the family\'s ritual memory.',
+           src:'Kiangan Municipal Office of Culture'},
+        ],
+        men:[
+          {id:6,gen:'Ceremonial Cape',dia:'Dukling',seed:22,
+           desc:'The Dukling is a woven cape worn by Kiangan men during the Uyauy feast. Its distinctive triangular form drapes over one shoulder, with tasseled edges that sway during dance movements — a visual indicator that the wearer holds Uyauy feast status in the community.',
+           src:'Kiangan Municipal Office of Culture'},
+        ]
+      },
+      Hungduan:{
+        women:[
+          {id:7,gen:'Wraparound Cloth',dia:'Paldong',seed:31,
+           desc:"The Paldong is Hungduan's signature women's garment, featuring bold horizontal striping in deep indigo and terracotta red. The cloth is dyed using plant-based pigments harvested from the mountain forests. Each stripe is said to represent a generation of the wearer's family lineage.",
+           src:'Hungduan Heritage Documentation Project'},
+        ],
+        men:[]
+      },
+      Lagawe:{
+        women:[],
+        men:[
+          {id:8,gen:'Beaded Headband',dia:'Pulkol',seed:41,
+           desc:"The Pulkol is crafted from white and red glass beads in specific ritual patterning, identifying the wearer's ceremonial role at a glance. Men who have completed the Baki ritual series wear the Pulkol with an additional feather pendant indicating their spiritual rank.",
+           src:'Lagawe Provincial Museum'},
+        ]
+      },
+      Aguinaldo:{
+        women:[
+          {id:9,gen:'Full Ceremonial Dress',dia:'Inabel',seed:51,
+           desc:"The Inabel is woven as a single integrated garment — top and skirt in one piece — with rich geometric patterns in crimson, black, and natural fiber. Its patterns are said to tell the story of the first Ifugao ancestor who wove the world from highland mountain mist.",
+           src:'Aguinaldo Traditional Arts Documentation'},
+        ],
+        men:[
+          {id:10,gen:'Full Ceremonial Attire',dia:'Bahag Set',seed:52,
+           desc:"The Bahag Set includes the loincloth, beaded collar, and woven arm bands worn as a unified ceremonial costume. Worn only during the highest-status feast occasions, the ensemble is believed to grant the wearer protection from mountain spirits and ancestral forces.",
+           src:'Aguinaldo Traditional Arts Documentation'},
+        ]
+      }
+    };
+
+    /* ── HOTSPOT DATA ──────────────────────────────────────── */
+    const HOTSPOTS = [
+      {id:1, x:50, y:10, label:'Headdress',      dia:'Pungol',
+       desc:"Crafted from woven rattan adorned with white and red glass beads, hornbill feathers, and boar tusks. It identifies the wearer's ritual status and village lineage at a glance — no words needed in a crowd of hundreds."},
+      {id:2, x:28, y:31, label:"Women's Upper",  dia:'Ampuyo',
+       desc:"Handwoven on a backstrap loom, the women's blouse features geometric patterns unique to each municipality. Ceremonial versions include metallic thread accents along the hemline, indicating the wearer's family has hosted the Uyauy feast."},
+      {id:3, x:72, y:31, label:"Men's Upper",    dia:'Bangkuong',
+       desc:"The men's ceremonial vest is decorated with intricate geometric embroidery in contrasting thread, marking the wearer as a participant in formal ritual. Its geometric motifs encode rank, lineage, and spiritual standing."},
+      {id:4, x:28, y:60, label:"Women's Lower",  dia:'Tapis',
+       desc:"The women's wraparound skirt carries dense geometric patterns indicating social standing. More elaborate designs are reserved for elite families, making attire a living social text readable by all community members."},
+      {id:5, x:72, y:60, label:"Men's Lower",    dia:'Wanes',
+       desc:"Considered the most sacred piece of Ifugao male dress, the loincloth's weaving patterns encode the warrior's accomplishments and family lineage — a cloth curriculum vitae worn with pride during ceremony and ritual."},
+      {id:6, x:50, y:84, label:'Accessories',    dia:'Bongon / Kumpay',
+       desc:"Strings of glass beads, shell ornaments, and brass rings adorn neck, wrists, and ankles. The belt secures the lower garment and carries additional ceremonial meaning — some types worn exclusively by those who have hosted community feasts."},
+    ];
+  </script>
+  <script type="text/babel" src="HeriApp.jsx"></script>
+</body>
+</html>
