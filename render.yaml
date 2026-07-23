@@ -1,0 +1,69 @@
+# NOTE: Render's free Postgres plan is auto-deleted 90 days after creation
+# (no warning grace period). Before that deadline: Render dashboard ->
+# heri-threads-db -> Settings -> Change Plan -> pick a paid tier.
+# Track the creation date once this is first deployed.
+databases:
+  - name: heri-threads-db
+    plan: free
+    databaseName: heri_threads
+    user: heri_threads
+
+services:
+  - type: web
+    name: heri-threads
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /up
+    disk:
+      name: heri-threads-storage
+      mountPath: /app/storage/app/public
+      sizeGB: 1
+    envVars:
+      - key: APP_NAME
+        value: Heri-THREADS
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_URL
+        fromService:
+          type: web
+          name: heri-threads
+          property: host
+      - key: LOG_CHANNEL
+        value: stack
+      - key: LOG_LEVEL
+        value: error
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: heri-threads-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: heri-threads-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: heri-threads-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: heri-threads-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: heri-threads-db
+          property: password
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: FILESYSTEM_DISK
+        value: public

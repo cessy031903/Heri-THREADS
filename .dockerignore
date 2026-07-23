@@ -1,0 +1,16 @@
+.git
+.gitignore
+vendor
+node_modules
+.env
+.env.*
+!.env.example
+database/database.sqlite
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+tests
+_design_handoff
+AUDIT.md
+HANDOFF.md
