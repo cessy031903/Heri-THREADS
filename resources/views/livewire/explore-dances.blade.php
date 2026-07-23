@@ -59,7 +59,7 @@
                     [$d, $l] = $pals[$palIndex];
                     $delay = $loop->index * 70;
                     $catColors = ['vb-pagaddut', 'vb-hinggatut', 'vb-dinuya'];
-                    $catKey = $catColors[crc32((string) $dance->category) % count($catColors)];
+                    $catKey = $catColors[abs(crc32((string) $dance->category)) % count($catColors)];
                 @endphp
                 <article class="dance-card-v2 anim-fade-up"
                          style="animation-delay:{{ $delay }}ms;"
@@ -121,7 +121,7 @@
         $palIndex = abs((int) $dance->id + 10) % count($pals);
         [$md, $ml] = $pals[$palIndex];
         $mCatColors = ['vb-pagaddut', 'vb-hinggatut', 'vb-dinuya'];
-        $mCatKey = $mCatColors[crc32((string) $dance->category) % count($mCatColors)];
+        $mCatKey = $mCatColors[abs(crc32((string) $dance->category)) % count($mCatColors)];
         $tagline = collect([$dance->region, $dance->origin])->filter()->implode(' · ');
     @endphp
     <div class="vis-modal-ov" wire:click.self="closeModal()"
