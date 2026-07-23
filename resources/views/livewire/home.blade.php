@@ -3,7 +3,24 @@
     <section class="hero">
 
         {{-- Ambient background effects --}}
-        <div class="hero-bg" aria-hidden="true">
+        <div class="hero-bg" aria-hidden="true"
+             x-data="{
+                slides: [
+                    '{{ asset('images/hero-banaue.avif') }}',
+                    '{{ asset('images/hero-batad-2.jpg') }}',
+                    '{{ asset('images/hero-batad-3.webp') }}',
+                ],
+                active: 0,
+                init() {
+                    setInterval(() => { this.active = (this.active + 1) % this.slides.length; }, 6000);
+                }
+             }">
+            <template x-for="(slide, i) in slides" :key="i">
+                <div class="hero-photo"
+                     :style="'background-image:url(\'' + slide + '\');'"
+                     :class="{ 'hero-photo-active': active === i }"></div>
+            </template>
+            <div class="hero-photo-shade"></div>
             <div class="hero-orb hero-orb-1"></div>
             <div class="hero-orb hero-orb-2"></div>
             <div class="hero-grid"></div>

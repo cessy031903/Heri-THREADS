@@ -190,6 +190,25 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="form-label">Upload Video <span style="font-weight:400;color:var(--gray-lt);">(optional — MP4/MOV/WebM, max 50 MB)</span></label>
+                        <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100px;border:2px dashed {{ $errors->has('video') ? 'var(--red)' : 'var(--tan)' }};border-radius:.5rem;cursor:pointer;background:var(--cream);transition:border-color 150ms;"
+                               onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='{{ $errors->has('video') ? 'var(--red)' : 'var(--tan)' }}'">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width:1.25rem;height:1.25rem;color:var(--gray-lt);margin-bottom:.375rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                            <span style="font-size:.78rem;color:var(--gray);">
+                                @if($video)
+                                    <span style="color:var(--gold);font-weight:600;">{{ $video->getClientOriginalName() }}</span>
+                                @else
+                                    Click to upload · MP4, MOV, or WebM, max 50 MB
+                                @endif
+                            </span>
+                            <input wire:model="video" type="file" accept="video/mp4,video/quicktime,video/webm" style="display:none;" />
+                        </label>
+                        @error('video') <p class="form-error">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label">
                             {{ $isEditing ? 'Replace Image (optional)' : 'Dance Image *' }}
                         </label>

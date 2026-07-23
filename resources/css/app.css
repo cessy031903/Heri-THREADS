@@ -1,6 +1,7 @@
-@import "tailwindcss";
-@plugin "daisyui/index.js";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap');
+@import "tailwindcss";
+@source "../views/**/*.blade.php";
+@plugin "daisyui/index.js";
 @font-face {
   font-family: 'BBT Pamumundok';
   src: url('https://github.com/johnmisael/bbt-pamumundok/releases/download/v1.0/BBTPamumundok-Regular.ttf') format('truetype');
@@ -1016,6 +1017,22 @@ body.heri-surface .mob-nav {
   inset: 0;
   pointer-events: none;
   z-index: 0;
+}
+.hero-photo {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.hero-photo-active {
+  opacity: .38;
+}
+.hero-photo-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--dark-bg) 0%, rgba(10,7,4,.55) 40%, var(--dark-bg) 100%);
 }
 .hero-orb {
   position: absolute;

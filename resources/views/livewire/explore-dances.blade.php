@@ -57,7 +57,8 @@
                     $pals = [['#7B3A10','#C4854A'],['#5C1F1F','#C85A17'],['#1A3A10','#3A7A24'],['#3A2A10','#A0824D'],['#1A2A4A','#3A6A95'],['#4A1A2A','#A84060'],['#2A3A10','#7A9A3A'],['#3A1A10','#B07040']];
                     [$d, $l] = $pals[($dance->id - 1) % count($pals)];
                     $delay = $loop->index * 70;
-                    $catKey = $dance->category === 'Ayangan' ? 'vb-Ayangan' : ($dance->category === 'Tuwali' ? 'vb-Tuwali' : 'vb-Kalanguya');
+                    $catColors = ['vb-pagaddut', 'vb-hinggatut', 'vb-dinuya'];
+                    $catKey = $catColors[crc32($dance->category) % count($catColors)];
                 @endphp
                 <article class="dance-card-v2 anim-fade-up"
                          style="animation-delay:{{ $delay }}ms;"
@@ -117,7 +118,8 @@
         $dance = $this->selectedDance;
         $pals = [['#7B3A10','#C4854A'],['#5C1F1F','#C85A17'],['#1A3A10','#3A7A24'],['#3A2A10','#A0824D'],['#1A2A4A','#3A6A95'],['#4A1A2A','#A84060'],['#2A3A10','#7A9A3A'],['#3A1A10','#B07040']];
         [$md, $ml] = $pals[(($dance->id + 10) - 1) % count($pals)];
-        $mCatKey = $dance->category === 'pagaddut' ? 'vb-pagaddut' : ($dance->category === 'hinggatut' ? 'vb-hinggatut' : 'vb-dinuya');
+        $mCatColors = ['vb-pagaddut', 'vb-hinggatut', 'vb-dinuya'];
+        $mCatKey = $mCatColors[crc32($dance->category) % count($mCatColors)];
         $tagline = collect([$dance->region, $dance->origin])->filter()->implode(' · ');
     @endphp
     <div class="vis-modal-ov" wire:click.self="closeModal()"
@@ -196,7 +198,14 @@
                         <span x-show="!$store.app || $store.app.lang === 'en'">Watch Performance</span>
                         <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Panoorin ang Pagtatanghal</span>
                     </p>
-                    @if($dance->embed_url)
+                    @if($dance->video_path)
+                        <div class="vid-wrap">
+                            <video src="{{ Storage::disk('public')->url($dance->video_path) }}"
+                                   controls
+                                   preload="metadata"
+                                   style="width:100%;height:100%;"></video>
+                        </div>
+                    @elseif($dance->embed_url)
                         <div class="vid-wrap">
                             <iframe src="{{ $dance->embed_url }}"
                                     title="{{ $dance->name }}"

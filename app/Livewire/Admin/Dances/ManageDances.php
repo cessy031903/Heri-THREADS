@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Dances;
 
+use App\Caching\HomepageCache;
 use App\Models\AuditLog;
 use App\Models\Dance;
 use Illuminate\Support\Facades\Storage;
@@ -28,6 +29,7 @@ class ManageDances extends Component
     public ?string $historical_background = '';
     public ?string $video_url  = '';
     public $image;
+    public $video;
 
     // Filters
     public string $search         = '';
@@ -54,6 +56,7 @@ class ManageDances extends Component
             'image'       => $this->isEditing
                 ? 'nullable|image|mimes:jpeg,png,jpg|max:10240'
                 : 'required|image|mimes:jpeg,png,jpg|max:10240',
+            'video'       => 'nullable|mimes:mp4,mov,webm|max:51200',
         ];
     }
 
@@ -141,16 +144,29 @@ class ManageDances extends Component
             $imagePath = $this->image->store('dances', 'public');
         }
 
+        $videoPath = null;
+        if ($this->video) {
+            // Delete old video before storing new one (prevent storage leak)
+            if ($this->isEditing) {
+                $existing = Dance::find($this->editingId);
+                if ($existing?->video_path) {
+                    Storage::disk('public')->delete($existing->video_path);
+                }
+            }
+            $videoPath = $this->video->store('dances-videos', 'public');
+        }
+
         if ($this->isEditing) {
             $dance = Dance::findOrFail($this->editingId);
             $dance->update(array_merge(
                 $validated,
-                $imagePath ? ['image_path' => $imagePath] : []
+                $imagePath ? ['image_path' => $imagePath] : [],
+                $videoPath ? ['video_path' => $videoPath] : []
             ));
             AuditLog::record('update', 'dance', $dance->id, $dance->name);
             $this->dispatch('toast', message: "Dance \"{$dance->name}\" updated.", type: 'success');
         } else {
-            $dance = Dance::create(array_merge($validated, ['image_path' => $imagePath]));
+            $dance = Dance::create(array_merge($validated, ['image_path' => $imagePath, 'video_path' => $videoPath]));
             AuditLog::record('create', 'dance', $dance->id, $dance->name);
             $this->dispatch('toast', message: "Dance \"{$dance->name}\" added.", type: 'success');
         }
@@ -158,6 +174,7 @@ class ManageDances extends Component
         $this->showModal = false;
         $this->resetForm();
         unset($this->dances);
+        HomepageCache::flush();
     }
 
     public function delete(int $id): void
@@ -166,17 +183,21 @@ class ManageDances extends Component
         if ($dance->image_path) {
             Storage::disk('public')->delete($dance->image_path);
         }
+        if ($dance->video_path) {
+            Storage::disk('public')->delete($dance->video_path);
+        }
         AuditLog::record('delete', 'dance', $dance->id, $dance->name);
         $dance->delete();
         $this->dispatch('toast', message: "Dance \"{$dance->name}\" deleted.", type: 'success');
         unset($this->dances);
+        HomepageCache::flush();
     }
 
     private function resetForm(): void
     {
         $this->reset([
             'name', 'category', 'description', 'region', 'origin',
-            'cultural_meaning', 'historical_background', 'video_url', 'image', 'editingId',
+            'cultural_meaning', 'historical_background', 'video_url', 'image', 'video', 'editingId',
         ]);
         $this->resetValidation();
     }
