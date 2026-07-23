@@ -186,9 +186,18 @@
 
                     <div class="form-group">
                         <label class="form-label">YouTube URL <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
-                        <input wire:model="video_url" type="url" placeholder="https://www.youtube.com/watch?v=…"
+                        <input wire:model.live.debounce.500ms="video_url" type="url" placeholder="https://www.youtube.com/watch?v=…"
                                class="form-input {{ $errors->has('video_url') ? 'error' : '' }}" />
                         @error('video_url') <p class="form-error">{{ $message }}</p> @enderror
+                        @if($this->videoUrlEmbed)
+                            <div class="vid-wrap" style="margin-top:.5rem;aspect-ratio:16/9;">
+                                <iframe src="{{ $this->videoUrlEmbed }}" title="YouTube preview" loading="lazy"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
+                                        allowfullscreen style="width:100%;height:100%;border:0;border-radius:.5rem;"></iframe>
+                            </div>
+                        @elseif($video_url)
+                            <p style="font-size:.72rem;color:var(--gray-lt);margin-top:.375rem;">Paste a valid YouTube link to see a preview.</p>
+                        @endif
                     </div>
 
                     <div class="form-group">
@@ -227,41 +236,6 @@
                         @error('video') <p class="form-error">{{ $message }}</p> @enderror
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">
-                            {{ $isEditing ? 'Replace Image (optional)' : 'Dance Image *' }}
-                        </label>
-                        @if($image && $image->isPreviewable())
-                            <div style="position:relative;margin-bottom:.5rem;width:100px;">
-                                <img src="{{ $image->temporaryUrl() }}" style="width:100px;height:100px;object-fit:cover;border-radius:.5rem;" />
-                                <button type="button" wire:click="$set('image', null)"
-                                        style="position:absolute;top:.25rem;right:.25rem;width:1.5rem;height:1.5rem;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;font-size:.8rem;line-height:1;"
-                                        title="Remove selected image" aria-label="Remove selected image">✕</button>
-                            </div>
-                        @elseif($image)
-                            {{-- Selected but not previewable — no preview, validation error shows below. --}}
-                        @elseif($isEditing && $existingImagePath)
-                            <div style="margin-bottom:.5rem;">
-                                <img src="{{ Storage::disk('public')->url($existingImagePath) }}" style="width:100px;height:100px;object-fit:cover;border-radius:.5rem;" />
-                            </div>
-                        @endif
-                        <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100px;border:2px dashed {{ $errors->has('image') ? 'var(--red)' : 'var(--tan)' }};border-radius:.5rem;cursor:pointer;background:var(--cream);transition:border-color 150ms;"
-                               onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='{{ $errors->has('image') ? 'var(--red)' : 'var(--tan)' }}'">
-                            <svg xmlns="http://www.w3.org/2000/svg" style="width:1.25rem;height:1.25rem;color:var(--gray-lt);margin-bottom:.375rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                            </svg>
-                            <span style="font-size:.78rem;color:var(--gray);">
-                                @if($image)
-                                    <span style="color:var(--gold);font-weight:600;">{{ $image->getClientOriginalName() }}</span>
-                                @else
-                                    Click to upload · JPG or PNG, max 10 MB
-                                @endif
-                            </span>
-                            <input wire:model="image" type="file" accept="image/jpeg,image/png,image/jpg" style="display:none;" />
-                        </label>
-                        <div wire:loading wire:target="image" style="font-size:.75rem;color:var(--gray);margin-top:.25rem;">Uploading image…</div>
-                        @error('image') <p class="form-error">{{ $message }}</p> @enderror
-                    </div>
                 </form>
             </div>
             <div class="modal-foot">

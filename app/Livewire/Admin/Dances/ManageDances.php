@@ -28,9 +28,7 @@ class ManageDances extends Component
     public ?string $cultural_meaning      = '';
     public ?string $historical_background = '';
     public ?string $video_url  = '';
-    public $image;
     public $video;
-    public ?string $existingImagePath = null;
     public ?string $existingVideoPath = null;
 
     // Filters
@@ -53,11 +51,8 @@ class ManageDances extends Component
             'historical_background' => 'nullable|string|max:2000',
             'video_url'   => [
                 'nullable', 'url',
-                'regex:/^https?:\/\/(www\.)?(youtube\.com\/(watch|shorts|embed)|youtu\.be)\/.+/',
+                'regex:/^https?:\/\/(www\.|m\.)?(youtube\.com\/(watch\?v=|shorts\/|embed\/)|youtu\.be\/).+/',
             ],
-            'image'       => $this->isEditing
-                ? 'nullable|image|mimes:jpeg,png,jpg|max:10240'
-                : 'required|image|mimes:jpeg,png,jpg|max:10240',
             'video'       => 'nullable|mimes:mp4,mov,webm|max:51200',
         ];
     }
@@ -83,6 +78,20 @@ class ManageDances extends Component
         ['id' => 'mayoyao', 'name' => 'Mayoyao'],
         ['id' => 'tinoc',   'name' => 'Tinoc'],
     ];
+
+    #[Computed]
+    public function videoUrlEmbed(): ?string
+    {
+        if (! $this->video_url) {
+            return null;
+        }
+        preg_match(
+            '/(?:v=|youtu\.be\/|shorts\/|embed\/)([a-zA-Z0-9_-]{11})/',
+            $this->video_url,
+            $m
+        );
+        return isset($m[1]) ? "https://www.youtube.com/embed/{$m[1]}" : null;
+    }
 
     #[Computed]
     public function dances()
@@ -120,7 +129,6 @@ class ManageDances extends Component
             'name', 'category', 'description', 'region', 'origin',
             'cultural_meaning', 'historical_background', 'video_url',
         ]));
-        $this->existingImagePath = $dance->image_path;
         $this->existingVideoPath = $dance->video_path;
         $this->editingId = $id;
         $this->isEditing = true;
@@ -134,18 +142,6 @@ class ManageDances extends Component
         // Store null (not an empty string) for optional text fields left blank.
         foreach (['video_url', 'region', 'origin', 'cultural_meaning', 'historical_background'] as $optional) {
             $validated[$optional] = filled($validated[$optional] ?? null) ? $validated[$optional] : null;
-        }
-
-        $imagePath = null;
-        if ($this->image) {
-            // Delete old image before storing new one (prevent storage leak)
-            if ($this->isEditing) {
-                $existing = Dance::find($this->editingId);
-                if ($existing?->image_path) {
-                    Storage::disk('public')->delete($existing->image_path);
-                }
-            }
-            $imagePath = $this->image->store('dances', 'public');
         }
 
         $videoPath = null;
@@ -164,13 +160,12 @@ class ManageDances extends Component
             $dance = Dance::findOrFail($this->editingId);
             $dance->update(array_merge(
                 $validated,
-                $imagePath ? ['image_path' => $imagePath] : [],
                 $videoPath ? ['video_path' => $videoPath] : []
             ));
             AuditLog::record('update', 'dance', $dance->id, $dance->name);
             $this->dispatch('toast', message: "Dance \"{$dance->name}\" updated.", type: 'success');
         } else {
-            $dance = Dance::create(array_merge($validated, ['image_path' => $imagePath, 'video_path' => $videoPath]));
+            $dance = Dance::create(array_merge($validated, ['video_path' => $videoPath]));
             AuditLog::record('create', 'dance', $dance->id, $dance->name);
             $this->dispatch('toast', message: "Dance \"{$dance->name}\" added.", type: 'success');
         }
@@ -201,8 +196,8 @@ class ManageDances extends Component
     {
         $this->reset([
             'name', 'category', 'description', 'region', 'origin',
-            'cultural_meaning', 'historical_background', 'video_url', 'image', 'video', 'editingId',
-            'existingImagePath', 'existingVideoPath',
+            'cultural_meaning', 'historical_background', 'video_url', 'video', 'editingId',
+            'existingVideoPath',
         ]);
         $this->resetValidation();
     }
