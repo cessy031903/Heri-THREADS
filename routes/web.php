@@ -8,8 +8,8 @@ Route::get('/dances',  \App\Livewire\ExploreDances::class)->name('dances');
 Route::get('/attires', \App\Livewire\ExploreAttires::class)->name('attires');
 
 // Auth
-Route::get('/login', \App\Livewire\Auth\Login::class)->name('login')->middleware('guest');
-Route::match(['get', 'post'], '/logout', function () {
+Route::get('/login', \App\Livewire\Auth\Login::class)->name('login')->middleware('guest')->middleware('throttle:10,1');
+Route::post('/logout', function () {
     auth()->logout();
     request()->session()->invalidate();
     request()->session()->regenerateToken();

@@ -3,8 +3,6 @@ module.exports = {
   content: [
     "./resources/views/**/*.blade.php",
     "./resources/js/**/*.jsx",
-    "./app/Filament/**/*.php",
-    "./resources/views/filament/**/*.blade.php",
   ],
   theme: {
     extend: {},

@@ -163,12 +163,6 @@ class ManageGuides extends Component
     public function save(): void
     {
         $validated = $this->validate();
-        if ($this->image) {
-    logger()->info('Image upload received', [
-        'name' => $this->image->getClientOriginalName(),
-        'size' => $this->image->getSize(),
-    ]);
-}
         $imagePath = $this->existingImagePath;
         if ($this->image) {
             if ($this->existingImagePath) {

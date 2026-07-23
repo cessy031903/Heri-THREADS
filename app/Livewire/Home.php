@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Attire;
 use App\Models\Dance;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -23,13 +24,13 @@ class Home extends Component
     #[Computed]
     public function danceCount(): int
     {
-        return Dance::count();
+        return Cache::remember('home.dance-count', 3600, fn () => Dance::count());
     }
 
     #[Computed]
     public function attireCount(): int
     {
-        return Attire::count();
+        return Cache::remember('home.attire-count', 3600, fn () => Attire::count());
     }
 
     #[Computed]
@@ -51,6 +52,11 @@ class Home extends Component
      */
     #[Computed]
     public function showcaseItems(): array
+    {
+        return Cache::remember('home.showcase-items', 3600, fn () => $this->buildShowcaseItems());
+    }
+
+    private function buildShowcaseItems(): array
     {
         $palettes = [
             ['#7B3A10', '#C4854A'],

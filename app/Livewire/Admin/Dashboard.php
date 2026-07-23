@@ -27,21 +27,16 @@ class Dashboard extends Component
         return InteractiveGuide::count();
     }
 
-    /** Dance counts per category, for the CSS bar chart. */
+    /** Dance counts per category (Ifugao municipality), for the CSS bar chart. */
     #[Computed]
     public function danceByCategory(): array
     {
-        $labels = ['pagaddut' => 'Pagaddut', 'hinggatut' => 'Hinggatut', 'dinuy-a' => 'Dinuy-a'];
-        $counts = Dance::selectRaw('category, COUNT(*) as total')
+        return Dance::selectRaw('category, COUNT(*) as total')
             ->groupBy('category')
-            ->pluck('total', 'category');
-
-        $rows = [];
-        foreach ($labels as $key => $label) {
-            $rows[] = ['label' => $label, 'value' => (int) ($counts[$key] ?? 0)];
-        }
-
-        return $rows;
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn ($r) => ['label' => ucfirst($r->category), 'value' => (int) $r->total])
+            ->all();
     }
 
     /** Attire counts per municipality (top of the list), for the CSS bar chart. */

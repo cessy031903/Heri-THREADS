@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Attires;
 
+use App\Caching\HomepageCache;
 use App\Models\AuditLog;
 use App\Models\Attire;
 use Illuminate\Support\Facades\Storage;
@@ -161,6 +162,7 @@ class ManageAttires extends Component
         $this->showModal = false;
         $this->resetForm();
         unset($this->attires);
+        HomepageCache::flush();
     }
 
     public function delete(int $id): void
@@ -173,6 +175,7 @@ class ManageAttires extends Component
         $attire->delete();
         $this->dispatch('toast', message: "Attire \"{$attire->name_general}\" deleted.", type: 'success');
         unset($this->attires);
+        HomepageCache::flush();
     }
 
     private function resetForm(): void
