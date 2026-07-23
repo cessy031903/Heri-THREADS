@@ -15,10 +15,6 @@ services:
     dockerfilePath: ./Dockerfile
     plan: free
     healthCheckPath: /up
-    disk:
-      name: heri-threads-storage
-      mountPath: /app/storage/app/public
-      sizeGB: 1
     envVars:
       - key: APP_NAME
         value: Heri-THREADS
@@ -67,3 +63,23 @@ services:
         value: database
       - key: FILESYSTEM_DISK
         value: public
+      # Free web service plan has no persistent disk, so the "public" disk
+      # is backed by Cloudflare R2 (S3-compatible) instead of local storage.
+      # Create a free R2 bucket + API token in the Cloudflare dashboard and
+      # fill these in on the Render dashboard (they are not committed here).
+      - key: PUBLIC_DISK_DRIVER
+        value: s3
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_DEFAULT_REGION
+        value: auto
+      - key: AWS_BUCKET
+        sync: false
+      - key: AWS_ENDPOINT
+        sync: false
+      - key: AWS_USE_PATH_STYLE_ENDPOINT
+        value: true
+      - key: PUBLIC_DISK_URL
+        sync: false
