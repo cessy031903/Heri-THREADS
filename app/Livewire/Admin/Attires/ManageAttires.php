@@ -29,6 +29,7 @@ class ManageAttires extends Component
     public ?string $cultural_significance  = '';
     public string $source_info   = '';
     public $image;
+    public ?string $existingImagePath = null;
 
     // Filters
     public string $search               = '';
@@ -120,6 +121,7 @@ class ManageAttires extends Component
             'name_general', 'name_dialect', 'municipality', 'gender',
             'description', 'material', 'cultural_significance', 'source_info',
         ]));
+        $this->existingImagePath = $attire->image_path;
         $this->editingId = $id;
         $this->isEditing = true;
         $this->showModal = true;
@@ -183,6 +185,7 @@ class ManageAttires extends Component
         $this->reset([
             'name_general', 'name_dialect', 'municipality', 'gender', 'description',
             'material', 'cultural_significance', 'source_info', 'image', 'editingId',
+            'existingImagePath',
         ]);
         $this->resetValidation();
     }

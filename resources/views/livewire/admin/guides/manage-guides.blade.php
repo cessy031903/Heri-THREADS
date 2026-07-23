@@ -98,7 +98,17 @@
 
                     <div class="form-group">
                         <label class="form-label">{{ $isEditing && $existingImagePath ? 'Replace Image (optional)' : 'Background Image (optional)' }}</label>
-                        @if($existingImagePath && ! $image)
+                        @if($image && $image->isPreviewable())
+                            <div style="position:relative;margin-bottom:.5rem;width:160px;">
+                                <img src="{{ $image->temporaryUrl() }}"
+                                     style="width:160px;height:90px;object-fit:cover;border-radius:.5rem;" />
+                                <button type="button" wire:click="$set('image', null)"
+                                        style="position:absolute;top:.25rem;right:.25rem;width:1.5rem;height:1.5rem;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;font-size:.8rem;line-height:1;"
+                                        title="Remove selected image" aria-label="Remove selected image">✕</button>
+                            </div>
+                        @elseif($image)
+                            {{-- Selected but not previewable — no preview, validation error shows below. --}}
+                        @elseif($existingImagePath)
                             <img src="{{ Storage::disk('public')->url($existingImagePath) }}"
                                  style="width:160px;height:90px;object-fit:cover;border-radius:.5rem;margin-bottom:.5rem;" />
                         @endif
@@ -112,6 +122,7 @@
                             </span>
                             <input wire:model="image" type="file" accept="image/jpeg,image/png,image/jpg" style="display:none;" />
                         </label>
+                        <div wire:loading wire:target="image" style="font-size:.75rem;color:var(--gray);margin-top:.25rem;">Uploading image…</div>
                         @error('image') <p class="form-error">{{ $message }}</p> @enderror
                     </div>
 

@@ -73,14 +73,16 @@
                     @forelse($this->attires as $attire)
                         <tr wire:key="attire-{{ $attire->id }}">
                             <td>
+                                @php
+                                    $pals=[['#7B3A10','#D4A574'],['#5C1F1F','#C85A17'],['#1A3A10','#4A8A2C'],['#3A2A10','#B8925D'],['#1A2A4A','#4A7AB5'],['#4A1A2A','#C86090'],['#2A3A10','#8AB54A'],['#3A1A10','#C89060']];
+                                    $p=$pals[((($attire->id + 10)%count($pals))+count($pals))%count($pals)];
+                                @endphp
                                 @if($attire->image_path)
                                     <img src="{{ Storage::disk('public')->url($attire->image_path) }}"
-                                         style="width:42px;height:42px;border-radius:6px;object-fit:cover;flex-shrink:0;" />
+                                         style="width:42px;height:42px;border-radius:6px;object-fit:cover;flex-shrink:0;"
+                                         onerror="this.style.display='none';this.nextElementSibling.style.display='block';" />
+                                    <div class="swatch" style="display:none;width:42px;height:42px;background:linear-gradient(135deg,{{$p[0]}},{{$p[1]}});"></div>
                                 @else
-                                    @php
-                                        $pals=[['#7B3A10','#D4A574'],['#5C1F1F','#C85A17'],['#1A3A10','#4A8A2C'],['#3A2A10','#B8925D'],['#1A2A4A','#4A7AB5'],['#4A1A2A','#C86090'],['#2A3A10','#8AB54A'],['#3A1A10','#C89060']];
-                                        $p=$pals[($attire->id + 10)%count($pals)];
-                                    @endphp
                                     <div class="swatch" style="width:42px;height:42px;background:linear-gradient(135deg,{{$p[0]}},{{$p[1]}});"></div>
                                 @endif
                             </td>
@@ -216,6 +218,20 @@
                         <label class="form-label">
                             {{ $isEditing ? 'Replace Image (optional)' : 'Attire Image *' }}
                         </label>
+                        @if($image && $image->isPreviewable())
+                            <div style="position:relative;margin-bottom:.5rem;width:100px;">
+                                <img src="{{ $image->temporaryUrl() }}" style="width:100px;height:100px;object-fit:cover;border-radius:.5rem;" />
+                                <button type="button" wire:click="$set('image', null)"
+                                        style="position:absolute;top:.25rem;right:.25rem;width:1.5rem;height:1.5rem;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;font-size:.8rem;line-height:1;"
+                                        title="Remove selected image" aria-label="Remove selected image">✕</button>
+                            </div>
+                        @elseif($image)
+                            {{-- Selected but not previewable — no preview, validation error shows below. --}}
+                        @elseif($isEditing && $existingImagePath)
+                            <div style="margin-bottom:.5rem;">
+                                <img src="{{ Storage::disk('public')->url($existingImagePath) }}" style="width:100px;height:100px;object-fit:cover;border-radius:.5rem;" />
+                            </div>
+                        @endif
                         <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100px;border:2px dashed {{ $errors->has('image') ? 'var(--red)' : 'var(--tan)' }};border-radius:.5rem;cursor:pointer;background:var(--cream);transition:border-color 150ms;"
                                onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='{{ $errors->has('image') ? 'var(--red)' : 'var(--tan)' }}'">
                             <svg xmlns="http://www.w3.org/2000/svg" style="width:1.25rem;height:1.25rem;color:var(--gray-lt);margin-bottom:.375rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -230,6 +246,7 @@
                             </span>
                             <input wire:model="image" type="file" accept="image/jpeg,image/png,image/jpg" style="display:none;" />
                         </label>
+                        <div wire:loading wire:target="image" style="font-size:.75rem;color:var(--gray);margin-top:.25rem;">Uploading image…</div>
                         @error('image') <p class="form-error">{{ $message }}</p> @enderror
                     </div>
                 </form>

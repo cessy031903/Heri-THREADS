@@ -30,6 +30,8 @@ class ManageDances extends Component
     public ?string $video_url  = '';
     public $image;
     public $video;
+    public ?string $existingImagePath = null;
+    public ?string $existingVideoPath = null;
 
     // Filters
     public string $search         = '';
@@ -118,6 +120,8 @@ class ManageDances extends Component
             'name', 'category', 'description', 'region', 'origin',
             'cultural_meaning', 'historical_background', 'video_url',
         ]));
+        $this->existingImagePath = $dance->image_path;
+        $this->existingVideoPath = $dance->video_path;
         $this->editingId = $id;
         $this->isEditing = true;
         $this->showModal = true;
@@ -198,6 +202,7 @@ class ManageDances extends Component
         $this->reset([
             'name', 'category', 'description', 'region', 'origin',
             'cultural_meaning', 'historical_background', 'video_url', 'image', 'video', 'editingId',
+            'existingImagePath', 'existingVideoPath',
         ]);
         $this->resetValidation();
     }
