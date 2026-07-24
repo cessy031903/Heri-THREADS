@@ -31,6 +31,7 @@ class ManageDances extends Component
     public ?string $video_url  = '';
     public $video;
     public ?string $existingVideoPath = null;
+    public bool $removeExistingVideo = false;
 
     // Filters
     public string $search         = '';
@@ -131,9 +132,15 @@ class ManageDances extends Component
             'cultural_meaning', 'historical_background', 'video_url',
         ]));
         $this->existingVideoPath = $dance->video_path;
+        $this->removeExistingVideo = false;
         $this->editingId = $id;
         $this->isEditing = true;
         $this->showModal = true;
+    }
+
+    public function markExistingVideoForRemoval(): void
+    {
+        $this->removeExistingVideo = true;
     }
 
     public function save(): void
@@ -156,13 +163,16 @@ class ManageDances extends Component
             }
             $videoPath = $this->video->store('dances-videos', 'public');
             VideoOptimizer::faststart('public', $videoPath);
+        } elseif ($this->isEditing && $this->removeExistingVideo && $this->existingVideoPath) {
+            Storage::disk('public')->delete($this->existingVideoPath);
         }
 
         if ($this->isEditing) {
             $dance = Dance::findOrFail($this->editingId);
             $dance->update(array_merge(
                 $validated,
-                $videoPath ? ['video_path' => $videoPath] : []
+                $videoPath ? ['video_path' => $videoPath] : [],
+                (! $videoPath && $this->removeExistingVideo) ? ['video_path' => null] : []
             ));
             AuditLog::record('update', 'dance', $dance->id, $dance->name);
             $this->dispatch('toast', message: "Dance \"{$dance->name}\" updated.", type: 'success');
@@ -199,7 +209,7 @@ class ManageDances extends Component
         $this->reset([
             'name', 'category', 'description', 'region', 'origin',
             'cultural_meaning', 'historical_background', 'video_url', 'video', 'editingId',
-            'existingVideoPath',
+            'existingVideoPath', 'removeExistingVideo',
         ]);
         $this->resetValidation();
     }

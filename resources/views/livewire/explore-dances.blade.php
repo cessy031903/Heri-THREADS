@@ -212,6 +212,7 @@
                             <iframe src="{{ $dance->embed_url }}"
                                     title="{{ $dance->name }}"
                                     loading="lazy"
+                                    referrerpolicy="no-referrer-when-downgrade"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
                                     allowfullscreen></iframe>
                         </div>

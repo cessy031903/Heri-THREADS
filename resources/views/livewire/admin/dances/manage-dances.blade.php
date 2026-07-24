@@ -192,6 +192,7 @@
                         @if($this->videoUrlEmbed)
                             <div class="vid-wrap" style="margin-top:.5rem;aspect-ratio:16/9;">
                                 <iframe src="{{ $this->videoUrlEmbed }}" title="YouTube preview" loading="lazy"
+                                        referrerpolicy="no-referrer-when-downgrade"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
                                         allowfullscreen style="width:100%;height:100%;border:0;border-radius:.5rem;"></iframe>
                             </div>
@@ -212,11 +213,20 @@
                             </div>
                         @elseif($video)
                             {{-- Selected but not previewable (e.g. rejected file type) — no preview, validation error shows below. --}}
-                        @elseif($isEditing && $existingVideoPath)
-                            <div style="margin-bottom:.5rem;">
+                        @elseif($isEditing && $existingVideoPath && ! $removeExistingVideo)
+                            <div style="position:relative;margin-bottom:.5rem;">
                                 <video src="{{ Storage::disk('public')->url($existingVideoPath) }}" controls preload="metadata"
                                        style="width:100%;max-height:180px;border-radius:.5rem;background:#000;"></video>
+                                <button type="button" wire:click="markExistingVideoForRemoval"
+                                        style="position:absolute;top:.375rem;right:.375rem;width:1.75rem;height:1.75rem;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;font-size:.9rem;line-height:1;"
+                                        title="Remove video" aria-label="Remove video">✕</button>
                             </div>
+                        @elseif($isEditing && $existingVideoPath && $removeExistingVideo)
+                            <p style="font-size:.78rem;color:var(--red);margin-bottom:.5rem;">
+                                Video will be removed when you save.
+                                <button type="button" wire:click="$set('removeExistingVideo', false)"
+                                        style="background:none;border:none;color:var(--gold);text-decoration:underline;cursor:pointer;font-size:.78rem;padding:0;">Undo</button>
+                            </p>
                         @endif
                         <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100px;border:2px dashed {{ $errors->has('video') ? 'var(--red)' : 'var(--tan)' }};border-radius:.5rem;cursor:pointer;background:var(--cream);transition:border-color 150ms;"
                                onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='{{ $errors->has('video') ? 'var(--red)' : 'var(--tan)' }}'">
