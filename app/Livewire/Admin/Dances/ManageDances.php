@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Dances;
 use App\Caching\HomepageCache;
 use App\Models\AuditLog;
 use App\Models\Dance;
+use App\Services\VideoOptimizer;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -154,6 +155,7 @@ class ManageDances extends Component
                 }
             }
             $videoPath = $this->video->store('dances-videos', 'public');
+            VideoOptimizer::faststart('public', $videoPath);
         }
 
         if ($this->isEditing) {

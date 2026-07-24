@@ -2,16 +2,6 @@
 @import "tailwindcss";
 @source "../views/**/*.blade.php";
 @plugin "daisyui/index.js";
-@font-face {
-  font-family: 'BBT Pamumundok';
-  src: url('https://github.com/johnmisael/bbt-pamumundok/releases/download/v1.0/BBTPamumundok-Regular.ttf') format('truetype');
-  font-weight: 400;
-}
-@font-face {
-  font-family: 'BBT Pamumundok';
-  src: url('https://github.com/johnmisael/bbt-pamumundok/releases/download/v1.0/BBTPamumundok-Bold.ttf') format('truetype');
-  font-weight: 700;
-}
 
 /* ── DESIGN TOKENS ─────────────────────────────────────────────── */
 :root {
@@ -35,7 +25,7 @@
   --font-admin:   'Inter', system-ui, sans-serif;
   --font-serif:   'Playfair Display', Georgia, serif;
   --font-body:    'Lora', serif;
-  --font-display: 'BBT Pamumundok', 'Playfair Display', serif;
+  --font-display: 'Playfair Display', serif;
   --font:         'Plus Jakarta Sans', system-ui, sans-serif;
 
   /* ── Spacing scale (8px grid) ── */

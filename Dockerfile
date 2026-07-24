@@ -7,6 +7,7 @@ RUN apk add --no-cache \
     npm \
     git \
     curl \
+    ffmpeg \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
