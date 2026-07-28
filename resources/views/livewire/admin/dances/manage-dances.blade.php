@@ -16,8 +16,8 @@
 
             <div class="tbl-filter">
                 <select wire:model.live="categoryFilter">
-                    <option value="">Municipality Categories</option>
-                    @foreach($categories as $cat)
+                    <option value="">All Categories</option>
+                    @foreach($danceTypes as $cat)
                         <option value="{{ $cat['id'] }}">{{ $cat['name'] }}</option>
                     @endforeach
                 </select>
@@ -81,12 +81,12 @@
                                 </div>
                             </td>
                             <td>
-                                <span style="font-size:.75rem;color:{{ $dance->video_url ? 'var(--green)' : 'var(--gray-lt)' }};">
+                                <span style="font-size:.75rem;color:{{ $dance->video_url ? 'var(--green)' : 'var(--gray)' }};">
                                     {{ $dance->video_url ? '✓ Set' : '— None' }}
                                 </span>
                             </td>
                             <td>
-                                <span style="font-size:.75rem;color:var(--gray-lt);">{{ $dance->created_at->format('M d, Y') }}</span>
+                                <span style="font-size:.75rem;color:var(--gray);">{{ $dance->created_at->format('M d, Y') }}</span>
                             </td>
                             <td>
                                 <div class="td-actions">
@@ -127,7 +127,7 @@
 
     {{-- ── MODAL ───────────────────────────────────────── --}}
     @if($showModal)
-    <x-ui.modal model="showModal" :title="$isEditing ? 'Edit Dance' : 'Add New Dance'">
+    <x-ui.modal model="showModal" :xl="true" :title="$isEditing ? 'Edit Dance' : 'Add New Dance'">
             <div class="modal-body">
                 <form wire:submit="save" id="dance-form">
                     <div class="form-group">
@@ -137,15 +137,27 @@
                         @error('name') <p class="form-error">{{ $message }}</p> @enderror
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Category *</label>
-                        <select wire:model="category" class="form-input form-select">
-                            <option value="">Select a category</option>
-                            @foreach($categories as $cat)
-                                <option value="{{ $cat['id'] }}">{{ $cat['name'] }}</option>
-                            @endforeach
-                        </select>
-                        @error('category') <p class="form-error">{{ $message }}</p> @enderror
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Category *</label>
+                            <select wire:model="category" class="form-input form-select">
+                                <option value="">Select a category</option>
+                                @foreach($danceTypes as $cat)
+                                    <option value="{{ $cat['id'] }}">{{ $cat['name'] }}</option>
+                                @endforeach
+                            </select>
+                            @error('category') <p class="form-error">{{ $message }}</p> @enderror
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Municipality <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
+                            <select wire:model="municipality" class="form-input form-select">
+                                <option value="">Select a municipality</option>
+                                @foreach($categories as $m)
+                                    <option value="{{ $m['id'] }}">{{ $m['name'] }}</option>
+                                @endforeach
+                            </select>
+                            @error('municipality') <p class="form-error">{{ $message }}</p> @enderror
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -170,18 +182,20 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Cultural Meaning <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
-                        <textarea wire:model="cultural_meaning" class="form-input"
-                                  placeholder="What this dance represents within the community…" style="min-height:80px;"></textarea>
-                        @error('cultural_meaning') <p class="form-error">{{ $message }}</p> @enderror
-                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Cultural Meaning <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
+                            <textarea wire:model="cultural_meaning" class="form-input"
+                                      placeholder="What this dance represents within the community…" style="min-height:80px;"></textarea>
+                            @error('cultural_meaning') <p class="form-error">{{ $message }}</p> @enderror
+                        </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Historical Background <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
-                        <textarea wire:model="historical_background" class="form-input"
-                                  placeholder="Origins, traditions, and how it has been passed down…" style="min-height:80px;"></textarea>
-                        @error('historical_background') <p class="form-error">{{ $message }}</p> @enderror
+                        <div class="form-group">
+                            <label class="form-label">Historical Background <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
+                            <textarea wire:model="historical_background" class="form-input"
+                                      placeholder="Origins, traditions, and how it has been passed down…" style="min-height:80px;"></textarea>
+                            @error('historical_background') <p class="form-error">{{ $message }}</p> @enderror
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -201,49 +215,87 @@
                         @endif
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Upload Video <span style="font-weight:400;color:var(--gray-lt);">(optional — MP4/MOV/WebM, max 50 MB)</span></label>
-                        @if($video && $video->isPreviewable())
-                            <div style="position:relative;margin-bottom:.5rem;">
-                                <video src="{{ $video->temporaryUrl() }}" controls preload="metadata"
-                                       style="width:100%;max-height:180px;border-radius:.5rem;background:#000;"></video>
-                                <button type="button" wire:click="$set('video', null)"
-                                        style="position:absolute;top:.375rem;right:.375rem;width:1.75rem;height:1.75rem;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;font-size:.9rem;line-height:1;"
-                                        title="Remove selected video" aria-label="Remove selected video">✕</button>
-                            </div>
-                        @elseif($video)
-                            {{-- Selected but not previewable (e.g. rejected file type) — no preview, validation error shows below. --}}
-                        @elseif($isEditing && $existingVideoPath && ! $removeExistingVideo)
-                            <div style="position:relative;margin-bottom:.5rem;">
-                                <video src="{{ Storage::disk('public')->url($existingVideoPath) }}" controls preload="metadata"
-                                       style="width:100%;max-height:180px;border-radius:.5rem;background:#000;"></video>
-                                <button type="button" wire:click="markExistingVideoForRemoval"
-                                        style="position:absolute;top:.375rem;right:.375rem;width:1.75rem;height:1.75rem;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;font-size:.9rem;line-height:1;"
-                                        title="Remove video" aria-label="Remove video">✕</button>
-                            </div>
-                        @elseif($isEditing && $existingVideoPath && $removeExistingVideo)
-                            <p style="font-size:.78rem;color:var(--red);margin-bottom:.5rem;">
-                                Video will be removed when you save.
-                                <button type="button" wire:click="$set('removeExistingVideo', false)"
-                                        style="background:none;border:none;color:var(--gold);text-decoration:underline;cursor:pointer;font-size:.78rem;padding:0;">Undo</button>
-                            </p>
-                        @endif
-                        <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100px;border:2px dashed {{ $errors->has('video') ? 'var(--red)' : 'var(--tan)' }};border-radius:.5rem;cursor:pointer;background:var(--cream);transition:border-color 150ms;"
-                               onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='{{ $errors->has('video') ? 'var(--red)' : 'var(--tan)' }}'">
-                            <svg xmlns="http://www.w3.org/2000/svg" style="width:1.25rem;height:1.25rem;color:var(--gray-lt);margin-bottom:.375rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                            </svg>
-                            <span style="font-size:.78rem;color:var(--gray);">
-                                @if($video)
-                                    <span style="color:var(--gold);font-weight:600;">{{ $video->getClientOriginalName() }}</span>
-                                @else
-                                    Click to upload · MP4, MOV, or WebM, max 50 MB
-                                @endif
-                            </span>
-                            <input wire:model="video" type="file" accept="video/mp4,video/quicktime,video/webm" style="display:none;" />
-                        </label>
-                        <div wire:loading wire:target="video" style="font-size:.75rem;color:var(--gray);margin-top:.25rem;">Uploading video…</div>
-                        @error('video') <p class="form-error">{{ $message }}</p> @enderror
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Upload Video <span style="font-weight:400;color:var(--gray-lt);">(optional — MP4/MOV/WebM, max 50 MB)</span></label>
+                            @if($video && $video->isPreviewable())
+                                <div style="position:relative;margin-bottom:.5rem;">
+                                    <video src="{{ $video->temporaryUrl() }}" controls preload="metadata"
+                                           style="width:100%;max-height:180px;border-radius:.5rem;background:#000;"></video>
+                                    <button type="button" wire:click="$set('video', null)"
+                                            style="position:absolute;top:.375rem;right:.375rem;width:1.75rem;height:1.75rem;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;font-size:.9rem;line-height:1;"
+                                            title="Remove selected video" aria-label="Remove selected video">✕</button>
+                                </div>
+                            @elseif($video)
+                                {{-- Selected but not previewable (e.g. rejected file type) — no preview, validation error shows below. --}}
+                            @elseif($isEditing && $existingVideoPath && ! $removeExistingVideo)
+                                <div style="position:relative;margin-bottom:.5rem;">
+                                    <video src="{{ Storage::disk('public')->url($existingVideoPath) }}" controls preload="metadata"
+                                           style="width:100%;max-height:180px;border-radius:.5rem;background:#000;"></video>
+                                    <button type="button" wire:click="markExistingVideoForRemoval"
+                                            style="position:absolute;top:.375rem;right:.375rem;width:1.75rem;height:1.75rem;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;font-size:.9rem;line-height:1;"
+                                            title="Remove video" aria-label="Remove video">✕</button>
+                                </div>
+                            @elseif($isEditing && $existingVideoPath && $removeExistingVideo)
+                                <p style="font-size:.78rem;color:var(--red);margin-bottom:.5rem;">
+                                    Video will be removed when you save.
+                                    <button type="button" wire:click="$set('removeExistingVideo', false)"
+                                            style="background:none;border:none;color:var(--gold);text-decoration:underline;cursor:pointer;font-size:.78rem;padding:0;">Undo</button>
+                                </p>
+                            @endif
+                            <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100px;border:2px dashed {{ $errors->has('video') ? 'var(--red)' : 'var(--tan)' }};border-radius:.5rem;cursor:pointer;background:var(--cream);transition:border-color 150ms;"
+                                   onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='{{ $errors->has('video') ? 'var(--red)' : 'var(--tan)' }}'">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:1.25rem;height:1.25rem;color:var(--gray-lt);margin-bottom:.375rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                <span style="font-size:.78rem;color:var(--gray);">
+                                    @if($video)
+                                        <span style="color:var(--gold);font-weight:600;">{{ $video->getClientOriginalName() }}</span>
+                                    @else
+                                        Click to upload · MP4, MOV, or WebM, max 50 MB
+                                    @endif
+                                </span>
+                                <input wire:model="video" type="file" accept="video/mp4,video/quicktime,video/webm" style="display:none;" />
+                            </label>
+                            <div wire:loading wire:target="video" style="font-size:.75rem;color:var(--gray);margin-top:.25rem;">Uploading video…</div>
+                            @error('video') <p class="form-error">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                {{ $isEditing ? 'Replace Image (optional)' : 'Dance Image (optional)' }}
+                            </label>
+                            @if($image && $image->isPreviewable())
+                                <div style="position:relative;margin-bottom:.5rem;width:100px;">
+                                    <img src="{{ $image->temporaryUrl() }}" style="width:100px;height:100px;object-fit:cover;border-radius:.5rem;" />
+                                    <button type="button" wire:click="$set('image', null)"
+                                            style="position:absolute;top:.25rem;right:.25rem;width:1.5rem;height:1.5rem;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;font-size:.8rem;line-height:1;"
+                                            title="Remove selected image" aria-label="Remove selected image">✕</button>
+                                </div>
+                            @elseif($image)
+                                {{-- Selected but not previewable — no preview, validation error shows below. --}}
+                            @elseif($isEditing && $existingImagePath)
+                                <div style="margin-bottom:.5rem;">
+                                    <img src="{{ Storage::disk('public')->url($existingImagePath) }}" style="width:100px;height:100px;object-fit:cover;border-radius:.5rem;" />
+                                </div>
+                            @endif
+                            <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100px;border:2px dashed {{ $errors->has('image') ? 'var(--red)' : 'var(--tan)' }};border-radius:.5rem;cursor:pointer;background:var(--cream);transition:border-color 150ms;"
+                                   onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='{{ $errors->has('image') ? 'var(--red)' : 'var(--tan)' }}'">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:1.25rem;height:1.25rem;color:var(--gray-lt);margin-bottom:.375rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                </svg>
+                                <span style="font-size:.78rem;color:var(--gray);">
+                                    @if($image)
+                                        <span style="color:var(--gold);font-weight:600;">{{ $image->getClientOriginalName() }}</span>
+                                    @else
+                                        Click to upload · JPG or PNG, max 10 MB
+                                    @endif
+                                </span>
+                                <input wire:model="image" type="file" accept="image/jpeg,image/png,image/jpg" style="display:none;" />
+                            </label>
+                            <div wire:loading wire:target="image" style="font-size:.75rem;color:var(--gray);margin-top:.25rem;">Uploading image…</div>
+                            @error('image') <p class="form-error">{{ $message }}</p> @enderror
+                        </div>
                     </div>
 
                 </form>

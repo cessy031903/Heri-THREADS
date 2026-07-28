@@ -23,13 +23,16 @@ class ManageDances extends Component
     // Form fields
     public string $name        = '';
     public string $category    = '';
+    public ?string $municipality = '';
     public string $description = '';
     public ?string $region                = '';
     public ?string $origin                = '';
     public ?string $cultural_meaning      = '';
     public ?string $historical_background = '';
     public ?string $video_url  = '';
+    public $image;
     public $video;
+    public ?string $existingImagePath = null;
     public ?string $existingVideoPath = null;
     public bool $removeExistingVideo = false;
 
@@ -45,7 +48,8 @@ class ManageDances extends Component
     {
         return [
             'name'        => 'required|string|max:255',
-            'category'    => 'required|in:aguinaldo,alista,asipulo,banaue,hingyon,hungduan,kiangan,lagawe,lamut,mayoyao,tinoc',
+            'category'    => 'required|in:pagaddut,hinggatut,dinuy-a',
+            'municipality' => 'nullable|in:aguinaldo,alista,asipulo,banaue,hingyon,hungduan,kiangan,lagawe,lamut,mayoyao,tinoc',
             'description' => 'required|string|max:1000',
             'region'                => 'nullable|string|max:255',
             'origin'                => 'nullable|string|max:255',
@@ -55,6 +59,9 @@ class ManageDances extends Component
                 'nullable', 'url',
                 'regex:/^https?:\/\/(www\.|m\.)?(youtube\.com\/(watch\?v=|shorts\/|embed\/)|youtu\.be\/).+/',
             ],
+            'image'       => $this->isEditing
+                ? 'nullable|image|mimes:jpeg,png,jpg|max:10240'
+                : 'nullable|image|mimes:jpeg,png,jpg|max:10240',
             'video'       => 'nullable|mimes:mp4,mov,webm|max:51200',
         ];
     }
@@ -65,6 +72,12 @@ class ManageDances extends Component
         ['key' => 'category',    'label' => 'Category',   'sortable' => true],
         ['key' => 'video_url',   'label' => 'Video'],
         ['key' => 'created_at',  'label' => 'Added',      'sortable' => true],
+    ];
+
+    public array $danceTypes = [
+        ['id' => 'pagaddut',  'name' => 'Pagaddut'],
+        ['id' => 'hinggatut', 'name' => 'Hinggatut'],
+        ['id' => 'dinuy-a',   'name' => 'Dinuy-a'],
     ];
 
     public array $categories = [
@@ -128,9 +141,10 @@ class ManageDances extends Component
     {
         $dance = Dance::findOrFail($id);
         $this->fill($dance->only([
-            'name', 'category', 'description', 'region', 'origin',
+            'name', 'category', 'municipality', 'description', 'region', 'origin',
             'cultural_meaning', 'historical_background', 'video_url',
         ]));
+        $this->existingImagePath = $dance->image_path;
         $this->existingVideoPath = $dance->video_path;
         $this->removeExistingVideo = false;
         $this->editingId = $id;
@@ -148,8 +162,20 @@ class ManageDances extends Component
         $validated = $this->validate();
 
         // Store null (not an empty string) for optional text fields left blank.
-        foreach (['video_url', 'region', 'origin', 'cultural_meaning', 'historical_background'] as $optional) {
+        foreach (['municipality', 'video_url', 'region', 'origin', 'cultural_meaning', 'historical_background'] as $optional) {
             $validated[$optional] = filled($validated[$optional] ?? null) ? $validated[$optional] : null;
+        }
+
+        $imagePath = null;
+        if ($this->image) {
+            // Delete old image before storing new one (prevent storage leak)
+            if ($this->isEditing) {
+                $existing = Dance::find($this->editingId);
+                if ($existing?->image_path) {
+                    Storage::disk('public')->delete($existing->image_path);
+                }
+            }
+            $imagePath = $this->image->store('dances', 'public');
         }
 
         $videoPath = null;
@@ -171,13 +197,14 @@ class ManageDances extends Component
             $dance = Dance::findOrFail($this->editingId);
             $dance->update(array_merge(
                 $validated,
+                $imagePath ? ['image_path' => $imagePath] : [],
                 $videoPath ? ['video_path' => $videoPath] : [],
                 (! $videoPath && $this->removeExistingVideo) ? ['video_path' => null] : []
             ));
             AuditLog::record('update', 'dance', $dance->id, $dance->name);
             $this->dispatch('toast', message: "Dance \"{$dance->name}\" updated.", type: 'success');
         } else {
-            $dance = Dance::create(array_merge($validated, ['video_path' => $videoPath]));
+            $dance = Dance::create(array_merge($validated, ['image_path' => $imagePath, 'video_path' => $videoPath]));
             AuditLog::record('create', 'dance', $dance->id, $dance->name);
             $this->dispatch('toast', message: "Dance \"{$dance->name}\" added.", type: 'success');
         }
@@ -207,9 +234,9 @@ class ManageDances extends Component
     private function resetForm(): void
     {
         $this->reset([
-            'name', 'category', 'description', 'region', 'origin',
-            'cultural_meaning', 'historical_background', 'video_url', 'video', 'editingId',
-            'existingVideoPath', 'removeExistingVideo',
+            'name', 'category', 'municipality', 'description', 'region', 'origin',
+            'cultural_meaning', 'historical_background', 'video_url', 'image', 'video', 'editingId',
+            'existingImagePath', 'existingVideoPath', 'removeExistingVideo',
         ]);
         $this->resetValidation();
     }

@@ -13,7 +13,7 @@ class DanceFactory extends Factory
     {
         return [
             'name'        => $this->faker->words(2, true),
-            'category'    => 'banaue',
+            'category'    => $this->faker->randomElement(['pagaddut', 'hinggatut', 'dinuy-a']),
             'description' => $this->faker->sentence(),
             'video_url'   => null,
             'video_path'  => null,

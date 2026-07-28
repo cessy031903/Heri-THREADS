@@ -2,6 +2,7 @@
     'model',                 // Livewire boolean property name, e.g. "showModal"
     'title' => null,
     'lg' => false,
+    'xl' => false,
     'maxWidth' => null,
 ])
 
@@ -23,7 +24,7 @@
 >
     <div
         x-on:click.stop
-        class="umodal-box {{ $lg ? 'umodal-box-lg' : '' }}"
+        class="umodal-box {{ $xl ? 'umodal-box-xl' : ($lg ? 'umodal-box-lg' : '') }}"
         @if($maxWidth) style="max-width:{{ $maxWidth }};" @endif
         role="dialog"
         aria-modal="true"

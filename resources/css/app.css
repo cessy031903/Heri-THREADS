@@ -21,6 +21,7 @@
   --white:   #FFFFFF;
   --red:     #C0392B;
   --red-lt:  #FDECEA;
+  --deep-oxblood: #5C1F1F;
 
   --font-admin:   'Inter', system-ui, sans-serif;
   --font-serif:   'Playfair Display', Georgia, serif;
@@ -254,7 +255,7 @@ html.modal-open body { overflow: hidden; }
 .bar-row   { display: grid; grid-template-columns: 92px 1fr 28px; align-items: center; gap: .75rem; }
 .bar-label { font-size: .76rem; font-weight: 600; color: var(--char); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bar-track { height: 10px; border-radius: var(--r-pill); background: var(--cream); overflow: hidden; border: 1px solid var(--tan); }
-.bar-fill  { display: block; height: 100%; border-radius: var(--r-pill); transition: width 500ms var(--ease); }
+.bar-fill  { display: block; width: 100%; height: 100%; border-radius: var(--r-pill); transform-origin: left; transform: scaleX(var(--bar-pct, 1)); transition: transform 500ms var(--ease); }
 .bar-fill-gold  { background: linear-gradient(90deg, var(--gold), var(--gold-dk, #b8925d)); }
 .bar-fill-green { background: linear-gradient(90deg, var(--green), #2d5016); }
 .bar-value { font-size: .78rem; font-weight: 700; color: var(--gray); text-align: right; }
@@ -365,6 +366,12 @@ html.modal-open body { overflow: hidden; }
   background: var(--white);
   color: var(--gray); cursor: pointer;
   transition: border-color 150ms, color 150ms, background 150ms;
+  position: relative;
+}
+/* Expand the tappable area to 44px without growing the visual icon, so it
+   stays compact in dense admin tables while meeting the touch-target minimum. */
+.btn-icon::before {
+  content: ''; position: absolute; inset: -6px;
 }
 .btn-icon:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-lt); }
 .btn-icon-danger:hover { border-color: var(--red); color: var(--red); background: var(--red-lt); }
@@ -388,8 +395,8 @@ html.modal-open body { overflow: hidden; }
 .bp { background: var(--gold); }
 .bh { background: var(--green); }
 .bd { background: var(--orange); }
-.bf { background: #8B5CF6; }
-.bm { background: #0891B2; }
+.bf { background: var(--deep-oxblood, #5C1F1F); }
+.bm { background: var(--org-moss); }
 
 /* ── ADMIN BUTTONS ─────────────────────────────────────────────── */
 .btn-admin {
@@ -478,6 +485,12 @@ textarea.form-input { resize: vertical; min-height: 100px; line-height: 1.6; }
   z-index: 2;
   transition: transform 120ms ease;
 }
+/* Expand the draggable hit area to 44px without growing the visible pin,
+   so adjacent pins don't visually overlap while still meeting the
+   touch-target minimum. */
+.hs-pin::before {
+  content: ''; position: absolute; inset: -9px; border-radius: 50%;
+}
 .hs-pin:hover { transform: translate(-50%, -50%) scale(1.12); }
 .hs-pin:active { cursor: grabbing; }
 
@@ -510,6 +523,9 @@ textarea.form-input { resize: vertical; min-height: 100px; line-height: 1.6; }
   opacity: 1;
 }
 .umodal-box-lg { max-width: 660px; }
+.umodal-box-xl { max-width: 1040px; }
+.form-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+@media (max-width: 760px) { .form-row-3 { grid-template-columns: 1fr; } }
 .modal-hd  {
   display: flex; align-items: center; justify-content: space-between;
   padding: 1.375rem 1.5rem; border-bottom: 1px solid var(--tan);
@@ -549,8 +565,11 @@ textarea.form-input { resize: vertical; min-height: 100px; line-height: 1.6; }
   display: flex; align-items: center; gap: .625rem;
   max-width: 320px;
 }
-.admin-toast-success { border-left: 3px solid #22C55E; }
-.admin-toast-error   { border-left: 3px solid var(--red); }
+.admin-toast::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.admin-toast-success::before { background: var(--green); }
+.admin-toast-error::before   { background: var(--red); }
 
 /* ── SWATCH PLACEHOLDER ────────────────────────────────────────── */
 .swatch { border-radius: 6px; flex-shrink: 0; }
@@ -1099,7 +1118,7 @@ body.heri-surface .mob-nav {
 }
 .hero-hl {
   font-style: normal;
-  color: #8ed86a;
+  color: var(--gold-lt);
 }
 .hero-ttl-2 {
   display: block;
@@ -1113,7 +1132,7 @@ body.heri-surface .mob-nav {
   font-family: var(--font-body);
   font-style: italic;
   font-size: clamp(.875rem, 1.25vw, 1rem);
-  color: rgba(255,255,255,.35);
+  color: rgba(255,255,255,.55);
   line-height: 1.85;
   max-width: 520px;
   margin-bottom: 2.25rem;
@@ -1277,10 +1296,11 @@ body.heri-surface .mob-nav {
 .cat-pill {
   font-family:var(--font-body); font-size:.75rem; font-weight:700;
   letter-spacing:.06em; text-transform:uppercase;
-  padding:.5rem 1.25rem; border-radius:9999px; cursor:pointer; border:1px solid transparent;
+  padding:.85rem 1.25rem; border-radius:9999px; cursor:pointer; border:1px solid transparent;
   background:rgba(255,255,255,.07); color:rgba(255,255,255,.48);
   transition:all 320ms var(--org-ease-out, cubic-bezier(0.22, 1, 0.36, 1)); white-space:nowrap;
   box-shadow:0 2px 12px rgba(0,0,0,.12);
+  min-height:44px; display:inline-flex; align-items:center;
 }
 .cat-pill.active {
   background:linear-gradient(135deg, var(--org-moss) 0%, color-mix(in srgb, var(--org-moss), #000 12%) 100%);
@@ -1302,9 +1322,16 @@ body.heri-surface .mob-nav {
 @media(max-width:1024px){ .dance-grid-v2 { grid-template-columns:repeat(2,1fr); } }
 @media(max-width:600px)  { .dance-grid-v2 { grid-template-columns:1fr; padding:0 1rem 3.5rem; } }
 
-/* Skeleton grid for public dances (toggled via class to preserve grid display) */
-.dance-skel-grid { display:none; }
-.dance-skel-grid.skel-on { display:grid; }
+/* Skeleton/results crossfade: both grids stack in the same box via the
+   .dance-results-stack wrapper, so filtering fades between them instead of
+   popping (display:none/grid can't be transitioned). */
+.dance-results-stack { position:relative; }
+.dance-skel-grid {
+  position:absolute; inset:0; opacity:0; pointer-events:none;
+  transition:opacity 220ms var(--ease, ease);
+}
+.dance-skel-grid.skel-on { opacity:1; pointer-events:auto; }
+.dance-grid-v2.results-fading { opacity:0; transition:opacity 180ms var(--ease, ease); }
 .dance-skel {
   aspect-ratio:3/4; border-radius:22px 18px 26px 20px / 20px 24px 18px 26px;
   background:linear-gradient(90deg, rgba(255,255,255,.04) 0%, rgba(255,255,255,.09) 50%, rgba(255,255,255,.04) 100%);
@@ -1426,7 +1453,7 @@ body.heri-surface .mob-nav {
 .vis-modal-vid-label { font-family:var(--font-body); font-size:.7rem; font-weight:700; color:var(--org-moss); letter-spacing:.12em; text-transform:uppercase; margin-bottom:.75rem; }
 .vis-close-btn {
   position:absolute; top:.875rem; right:.875rem;
-  width:40px; height:40px; border-radius:50%;
+  width:44px; height:44px; border-radius:50%;
   background:rgba(253,252,248,.94); border:2px solid color-mix(in srgb, var(--org-timber), transparent 30%);
   cursor:pointer; display:flex; align-items:center; justify-content:center;
   font-size:.9rem; color:var(--org-moss); transition:background 220ms, transform 220ms, box-shadow 220ms;
@@ -1652,7 +1679,7 @@ body.heri-surface .mob-nav {
   font-family: var(--font-display);
   font-size: clamp(1.25rem, 2.5vw, 1.75rem);
   font-weight: 700;
-  color: rgba(255,255,255,.92);
+  color: var(--org-foreground);
   letter-spacing: -.02em;
   margin-bottom: .4rem;
 }
@@ -1660,7 +1687,7 @@ body.heri-surface .mob-nav {
   font-family: var(--font-body);
   font-style: italic;
   font-size: .85rem;
-  color: rgba(255,255,255,.4);
+  color: var(--gray);
   margin-bottom: 1.25rem;
 }
 .paired-wrap { border-radius:1.25rem; overflow:hidden; position:relative; }
@@ -1714,7 +1741,6 @@ body.heri-surface .mob-nav {
 .hs-legend-dot { width:18px; height:18px; border-radius:50%; background:var(--gold); color:white; display:flex; align-items:center; justify-content:center; font-size:.6rem; font-weight:800; flex-shrink:0; }
 @media(max-width:600px) {
   .guide-stage { aspect-ratio: 4 / 3; }
-  .hs-dot { width:38px; height:38px; }
   .hs-inner { width:24px; height:24px; font-size:.62rem; }
   .hs-ring { width:30px; height:30px; }
   .hs-tooltip { width:170px; font-size:.72rem; }

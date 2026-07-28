@@ -19,17 +19,20 @@ class SecurityHeaders
         $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
         // In local dev, APP_URL and the hostname actually typed into the browser
         // (localhost vs 127.0.0.1) are easy to mismatch — CSP treats them as
-        // different origins and silently blocks media-src 'self' either way.
+        // different origins and silently blocks img-src/media-src 'self' either way.
         $mediaSrc = app()->environment('local')
             ? "media-src 'self' http://localhost:* http://127.0.0.1:*"
             : "media-src 'self'";
+        $imgSrc = app()->environment('local')
+            ? "img-src 'self' data: blob: http://localhost:* http://127.0.0.1:*"
+            : "img-src 'self' data: blob:";
 
         $response->headers->set('Content-Security-Policy', implode('; ', [
             "default-src 'self'",
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             "font-src 'self' https://fonts.gstatic.com https://github.com",
-            "img-src 'self' data: blob:",
+            $imgSrc,
             $mediaSrc,
             "connect-src 'self'",
             "frame-src https://www.youtube.com",

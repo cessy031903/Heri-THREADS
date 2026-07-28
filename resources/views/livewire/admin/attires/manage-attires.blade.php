@@ -145,7 +145,7 @@
 
     {{-- ── MODAL ───────────────────────────────────────── --}}
     @if($showModal)
-    <x-ui.modal model="showModal" :lg="true" :title="$isEditing ? 'Edit Attire' : 'Add New Attire'">
+    <x-ui.modal model="showModal" :xl="true" :title="$isEditing ? 'Edit Attire' : 'Add New Attire'">
             <div class="modal-body">
                 <form wire:submit="save" id="attire-form">
                     <div class="form-row">
@@ -193,11 +193,20 @@
                         @error('description') <p class="form-error">{{ $message }}</p> @enderror
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Fabric / Material <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
-                        <input wire:model="material" type="text" placeholder="e.g. Handwoven cotton, ikat-dyed threads"
-                               class="form-input" />
-                        @error('material') <p class="form-error">{{ $message }}</p> @enderror
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Fabric / Material <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
+                            <input wire:model="material" type="text" placeholder="e.g. Handwoven cotton, ikat-dyed threads"
+                                   class="form-input" />
+                            @error('material') <p class="form-error">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Source / Reference</label>
+                            <input wire:model="source_info" type="text" placeholder="e.g. National Museum of the Philippines"
+                                   class="form-input" />
+                            @error('source_info') <p class="form-error">{{ $message }}</p> @enderror
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -205,13 +214,6 @@
                         <textarea wire:model="cultural_significance" class="form-input"
                                   placeholder="The meaning, rituals, or status this attire conveys…" style="min-height:80px;"></textarea>
                         @error('cultural_significance') <p class="form-error">{{ $message }}</p> @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Source / Reference</label>
-                        <input wire:model="source_info" type="text" placeholder="e.g. National Museum of the Philippines"
-                               class="form-input" />
-                        @error('source_info') <p class="form-error">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="form-group">

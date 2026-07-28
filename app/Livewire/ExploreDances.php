@@ -18,17 +18,9 @@ class ExploreDances extends Component
 
     public array $categories = [
         ['id' => '',          'name' => 'All'],
-        ['id' => 'aguinaldo',  'name' => 'Aguinaldo'],
-        ['id' => 'alista', 'name' => 'Alfonso Lista'],
-        ['id' => 'asipulo',   'name' => 'Asipulo'],
-        ['id' => 'banaue',  'name' => 'Banaue'],
-        ['id' => 'hingyon', 'name' => 'Hingyon'],
-        ['id' => 'hungduan',   'name' => 'Hungduan'],
-        ['id' => 'kiangan',  'name' => 'Kiangan'],
-        ['id' => 'lagawe', 'name' => 'Lagawe'],
-        ['id' => 'lamut',   'name' => 'Lamut'],
-        ['id' => 'mayoyao', 'name' => 'Mayoyao'],
-        ['id' => 'tinoc',   'name' => 'Tinoc'],
+        ['id' => 'pagaddut',  'name' => 'Pagaddut'],
+        ['id' => 'hinggatut', 'name' => 'Hinggatut'],
+        ['id' => 'dinuy-a',   'name' => 'Dinuy-a'],
     ];
 
     #[Computed]
@@ -36,7 +28,10 @@ class ExploreDances extends Component
     {
         return Dance::query()
             ->when($this->categoryFilter, fn ($q) => $q->where('category', $this->categoryFilter))
-            ->when($this->search, fn ($q) => $q->where('name', 'like', "%{$this->search}%"))
+            ->when($this->search, fn ($q) => $q->where(function ($q) {
+                $q->where('name', 'like', "%{$this->search}%")
+                    ->orWhere('municipality', 'like', "%{$this->search}%");
+            }))
             ->orderBy('name')
             ->paginate(12);
     }
@@ -72,6 +67,14 @@ class ExploreDances extends Component
     {
         $this->showModal = false;
         $this->selectedDanceId = null;
+    }
+
+    public function clearFilters(): void
+    {
+        $this->search = '';
+        $this->categoryFilter = '';
+        $this->resetPage();
+        unset($this->dances);
     }
 
     public function updatingCategoryFilter(): void

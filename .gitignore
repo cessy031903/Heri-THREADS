@@ -24,3 +24,9 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Local-only tooling/notes — not shared with other machines
+/.claude/
+/.impeccable/
+/DESIGN.md
+/PRODUCT.md

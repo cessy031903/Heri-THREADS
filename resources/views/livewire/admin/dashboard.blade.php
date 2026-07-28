@@ -43,7 +43,7 @@
                     <div class="bar-row">
                         <span class="bar-label">{{ $row['label'] }}</span>
                         <span class="bar-track">
-                            <span class="bar-fill bar-fill-gold" style="width:{{ round($row['value'] / $maxD * 100) }}%;"></span>
+                            <span class="bar-fill bar-fill-gold" style="--bar-pct:{{ $row['value'] / $maxD }};"></span>
                         </span>
                         <span class="bar-value">{{ $row['value'] }}</span>
                     </div>
@@ -59,12 +59,12 @@
                     <div class="bar-row">
                         <span class="bar-label">{{ $row['label'] }}</span>
                         <span class="bar-track">
-                            <span class="bar-fill bar-fill-green" style="width:{{ round($row['value'] / $maxM * 100) }}%;"></span>
+                            <span class="bar-fill bar-fill-green" style="--bar-pct:{{ $row['value'] / $maxM }};"></span>
                         </span>
                         <span class="bar-value">{{ $row['value'] }}</span>
                     </div>
                 @empty
-                    <p style="font-size:.85rem;color:var(--gray-lt);font-style:italic;">No attire data yet.</p>
+                    <p style="font-size:.85rem;color:var(--gray);font-style:italic;">No attire data yet.</p>
                 @endforelse
             </div>
         </div>
@@ -146,7 +146,7 @@
                         </div>
                     </div>
                 @empty
-                    <p style="font-size:.875rem; color:var(--gray-lt); font-style:italic; padding:.5rem 0;">No activity yet. Start adding dances and attires.</p>
+                    <p style="font-size:.875rem; color:var(--gray); font-style:italic; padding:.5rem 0;">No activity yet. Start adding dances and attires.</p>
                 @endforelse
             </div>
         </div>

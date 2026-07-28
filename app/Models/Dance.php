@@ -13,6 +13,7 @@ class Dance extends Model
     protected $fillable = [
         'name',
         'category',
+        'municipality',
         'description',
         'region',
         'origin',

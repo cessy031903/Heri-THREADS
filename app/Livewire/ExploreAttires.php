@@ -5,10 +5,12 @@ namespace App\Livewire;
 use App\Models\Attire;
 use App\Models\InteractiveGuide;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class ExploreAttires extends Component
 {
+    #[Url(as: 'municipality', history: true)]
     public ?string $selectedMunicipality = null;
 
     public ?int $selectedAttireId = null;
@@ -26,6 +28,12 @@ class ExploreAttires extends Component
         'Lamut',
         'Mayoyao',
         'Tinoc',
+    ];
+
+    /** Deterministic gradient palette used to color placeholder cards by id. Single source shared across the view instead of being redeclared per section. */
+    public array $attirePals = [
+        ['#7B3A10', '#C4854A'], ['#5C1F1F', '#C85A17'], ['#1A3A10', '#3A7A24'], ['#3A2A10', '#A0824D'],
+        ['#1A2A4A', '#3A6A95'], ['#4A1A2A', '#A84060'], ['#2A3A10', '#7A9A3A'], ['#3A1A10', '#B07040'],
     ];
 
     #[Computed]

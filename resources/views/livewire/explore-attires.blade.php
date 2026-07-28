@@ -1,7 +1,7 @@
 <div>
     @if(! $selectedMunicipality)
         {{-- ── MUNICIPALITY SELECTION ──────────────────────────── --}}
-        <div class="vis-page-dark">
+        <div class="vis-page-dark anim-fade-up" wire:key="mun-select">
             <div class="vis-page-hd">
                 <p class="vis-eyebrow">Ifugao Cultural Archive</p>
                 <h1 class="vis-page-title">
@@ -25,6 +25,8 @@
                     <article class="mun-card-v2 anim-fade-up"
                              style="animation-delay:{{ $i * 80 }}ms;"
                              wire:click="selectMunicipality('{{ $muni }}')"
+                             @keydown.enter="$wire.selectMunicipality('{{ $muni }}')"
+                             @keydown.space.prevent="$wire.selectMunicipality('{{ $muni }}')"
                              role="button" tabindex="0"
                              aria-label="Explore {{ $muni }}">
                         <div style="position:absolute;inset:0;background:linear-gradient(148deg,{{ $md }} 0%,{{ $ml }} 100%);">
@@ -60,7 +62,7 @@
             $munInitials = mb_strtoupper(mb_substr(preg_replace('/\s+/u', '', $selectedMunicipality), 0, 2));
         @endphp
 
-        <div class="mun-profile-page">
+        <div class="mun-profile-page anim-fade-up" wire:key="mun-detail-{{ $selectedMunicipality }}">
             <div class="mun-profile-cover" style="--cov-a: {{ $covD }}; --cov-b: {{ $covL }};">
                 <div class="mun-profile-cover-bg" aria-hidden="true">
                     <svg class="mun-cover-svg" viewBox="0 0 80 80" preserveAspectRatio="xMidYMid slice">
@@ -103,6 +105,7 @@
                                 <img src="{{ Storage::disk('public')->url($this->guide->image_path) }}"
                                      alt="{{ $this->guide->title }}"
                                      class="guide-img"
+                                     loading="lazy"
                                      onerror="this.style.display='none'">
                             @else
                                 <div class="guide-fallback" aria-hidden="true">
@@ -162,11 +165,14 @@
                     <div class="sec-line"></div>
                     @forelse($this->womenAttires as $i => $attire)
                         @php
-                            $aPals = [['#7B3A10','#C4854A'],['#5C1F1F','#C85A17'],['#1A3A10','#3A7A24'],['#3A2A10','#A0824D'],['#1A2A4A','#3A6A95'],['#4A1A2A','#A84060'],['#2A3A10','#7A9A3A'],['#3A1A10','#B07040']];
-                            [$ad, $al] = $aPals[($attire->id - 1) % count($aPals)];
+                            $aPals = $this->attirePals;
+                            [$ad, $al] = $aPals[abs((int) $attire->id) % count($aPals)];
                         @endphp
                         <article class="attire-card attire-card-clickable" style="animation-delay:{{ $i * 90 }}ms;"
-                                 wire:click="selectAttire({{ $attire->id }})" wire:key="att-{{ $attire->id }}"
+                                 wire:click="selectAttire({{ $attire->id }})"
+                                 @keydown.enter="$wire.selectAttire({{ $attire->id }})"
+                                 @keydown.space.prevent="$wire.selectAttire({{ $attire->id }})"
+                                 wire:key="att-{{ $attire->id }}"
                                  role="button" tabindex="0" aria-label="View {{ $attire->name_general }}">
                             <div class="att-img">
                                 <div style="height:100%;min-height:220px;background:linear-gradient(148deg,{{ $ad }} 0%,{{ $al }} 100%);position:relative;">
@@ -181,6 +187,7 @@
                                 @if($attire->image_path)
                                     <img src="{{ Storage::disk('public')->url($attire->image_path) }}"
                                          alt="{{ $attire->name_general }}"
+                                         loading="lazy"
                                          onerror="this.style.display='none'"
                                          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
                                 @endif
@@ -215,11 +222,14 @@
                     <div class="sec-line"></div>
                     @forelse($this->menAttires as $i => $attire)
                         @php
-                            $aPals = [['#7B3A10','#C4854A'],['#5C1F1F','#C85A17'],['#1A3A10','#3A7A24'],['#3A2A10','#A0824D'],['#1A2A4A','#3A6A95'],['#4A1A2A','#A84060'],['#2A3A10','#7A9A3A'],['#3A1A10','#B07040']];
-                            [$ad, $al] = $aPals[($attire->id - 1) % count($aPals)];
+                            $aPals = $this->attirePals;
+                            [$ad, $al] = $aPals[abs((int) $attire->id) % count($aPals)];
                         @endphp
                         <article class="attire-card attire-card-clickable" style="animation-delay:{{ $i * 90 }}ms;"
-                                 wire:click="selectAttire({{ $attire->id }})" wire:key="att-{{ $attire->id }}"
+                                 wire:click="selectAttire({{ $attire->id }})"
+                                 @keydown.enter="$wire.selectAttire({{ $attire->id }})"
+                                 @keydown.space.prevent="$wire.selectAttire({{ $attire->id }})"
+                                 wire:key="att-{{ $attire->id }}"
                                  role="button" tabindex="0" aria-label="View {{ $attire->name_general }}">
                             <div class="att-img">
                                 <div style="height:100%;min-height:220px;background:linear-gradient(148deg,{{ $ad }} 0%,{{ $al }} 100%);position:relative;">
@@ -234,6 +244,7 @@
                                 @if($attire->image_path)
                                     <img src="{{ Storage::disk('public')->url($attire->image_path) }}"
                                          alt="{{ $attire->name_general }}"
+                                         loading="lazy"
                                          onerror="this.style.display='none'"
                                          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
                                 @endif
@@ -268,8 +279,8 @@
     @if($showAttireModal && $this->selectedAttire)
     @php
         $attire = $this->selectedAttire;
-        $aPals = [['#7B3A10','#C4854A'],['#5C1F1F','#C85A17'],['#1A3A10','#3A7A24'],['#3A2A10','#A0824D'],['#1A2A4A','#3A6A95'],['#4A1A2A','#A84060'],['#2A3A10','#7A9A3A'],['#3A1A10','#B07040']];
-        [$amd, $aml] = $aPals[($attire->id - 1) % count($aPals)];
+        $aPals = $this->attirePals;
+        [$amd, $aml] = $aPals[abs((int) $attire->id) % count($aPals)];
         $genderKey = $attire->gender === 'women' ? 'bf' : 'bm';
         $aTagline = collect([$attire->name_dialect, $attire->municipality])->filter()->implode(' · ');
     @endphp
@@ -342,7 +353,7 @@
                         <p class="vis-modal-vid-label">◆ More from {{ $attire->municipality }}</p>
                         <div class="dmodal-related">
                             @foreach($this->relatedAttires as $rel)
-                                @php [$rd, $rl] = $aPals[($rel->id - 1) % count($aPals)]; @endphp
+                                @php [$rd, $rl] = $aPals[abs((int) $rel->id) % count($aPals)]; @endphp
                                 <button type="button" class="rel-card" wire:click="selectAttire({{ $rel->id }})" wire:key="arel-{{ $rel->id }}">
                                     <span class="rel-thumb" style="background:linear-gradient(148deg,{{ $rd }},{{ $rl }});">
                                         @if($rel->image_path)

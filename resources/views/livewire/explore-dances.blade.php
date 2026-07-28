@@ -43,7 +43,8 @@
             </div>
         </div>
 
-        {{-- Skeleton grid (shown while searching/filtering) --}}
+        {{-- Skeleton grid (crossfades over the results while searching/filtering) --}}
+        <div class="dance-results-stack">
         <div class="dance-grid-v2 dance-skel-grid" wire:loading.delay.class="skel-on" wire:target="search,categoryFilter">
             @for($s = 0; $s < 8; $s++)
                 <div class="dance-skel"></div>
@@ -51,7 +52,7 @@
         </div>
 
         {{-- Dance Cards V2 --}}
-        <section class="dance-grid-v2" wire:loading.delay.remove wire:target="search,categoryFilter">
+        <section class="dance-grid-v2" wire:loading.delay.class="results-fading" wire:target="search,categoryFilter">
             @forelse($this->dances as $i => $dance)
                 @php
                     $pals = [['#7B3A10','#C4854A'],['#5C1F1F','#C85A17'],['#1A3A10','#3A7A24'],['#3A2A10','#A0824D'],['#1A2A4A','#3A6A95'],['#4A1A2A','#A84060'],['#2A3A10','#7A9A3A'],['#3A1A10','#B07040']];
@@ -64,6 +65,8 @@
                 <article class="dance-card-v2 anim-fade-up"
                          style="animation-delay:{{ $delay }}ms;"
                          wire:click="selectDance({{ $dance->id }})"
+                         @keydown.enter="$wire.selectDance({{ $dance->id }})"
+                         @keydown.space.prevent="$wire.selectDance({{ $dance->id }})"
                          role="button" tabindex="0"
                          aria-label="Explore {{ $dance->name }}">
                     {{-- Gradient background --}}
@@ -100,10 +103,21 @@
                 </article>
             @empty
                 <div style="grid-column:1/-1; text-align:center; padding:5rem 1.5rem;">
-                    <p style="font-family:var(--font-body); font-size:1rem; color:rgba(255,255,255,.3); font-style:italic;">No dances found.</p>
+                    <p style="font-family:var(--font-body); font-size:1rem; color:rgba(255,255,255,.3); font-style:italic;">
+                        <span x-show="!$store.app || $store.app.lang === 'en'">No dances found{{ $search ? " matching \"{$search}\"" : '' }}.</span>
+                        <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Walang nahanap na sayaw{{ $search ? " para sa \"{$search}\"" : '' }}.</span>
+                    </p>
+                    @if($search || $categoryFilter)
+                        <button wire:click="clearFilters"
+                                style="margin-top:.75rem;background:none;border:none;color:var(--gold);text-decoration:underline;cursor:pointer;font-family:var(--font-body);font-size:.85rem;">
+                            <span x-show="!$store.app || $store.app.lang === 'en'">Clear filters</span>
+                            <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>I-clear ang mga filter</span>
+                        </button>
+                    @endif
                 </div>
             @endforelse
         </section>
+        </div>
 
         {{-- Pagination --}}
         @if($this->dances->hasPages())
@@ -145,7 +159,7 @@
                 @endif
                 <div class="dmodal-hero-shade"></div>
                 <div class="dmodal-hero-text">
-                    <span class="vis-badge {{ $mCatKey }}">{{ $dance->category }}</span>
+                    <span class="vis-badge {{ $mCatKey }}">{{ $dance->municipality ?? $dance->category }}</span>
                     <h2 class="dmodal-title">{{ $dance->name }}</h2>
                     @if($tagline)
                         <p class="dmodal-tagline">{{ $tagline }}</p>

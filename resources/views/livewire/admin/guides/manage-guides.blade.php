@@ -67,7 +67,7 @@
 
     {{-- ── MODAL ───────────────────────────────────────── --}}
     @if($showModal)
-    <x-ui.modal model="showModal" :lg="true" :title="$isEditing ? 'Edit Guide' : 'New Interactive Guide'">
+    <x-ui.modal model="showModal" :xl="true" :title="$isEditing ? 'Edit Guide' : 'New Interactive Guide'">
             <div class="modal-body">
                 <form wire:submit="save" id="guide-form">
                     <div class="form-row">
@@ -148,7 +148,7 @@
                         @if($previewUrl)
                             <p style="font-size:.72rem;color:var(--gray);margin-bottom:.6rem;">
                                 <strong>Click</strong> on the image to drop a hotspot, then fill in its label below.
-                                <strong>Drag</strong> a pin to reposition it.
+                                <strong>Drag</strong> a pin to reposition it, or use the X%/Y% fields below to type an exact position without the mouse.
                             </p>
                             <div class="hs-stage"
                                  x-data="{
@@ -214,12 +214,12 @@
 
                                 <div class="form-row" style="margin-bottom:.6rem;">
                                     <div class="form-group" style="margin:0;">
-                                        <label class="form-label">X % <span style="font-weight:400;color:var(--gray-lt);">(click image)</span></label>
+                                        <label class="form-label">X % <span style="font-weight:400;color:var(--gray);">(or click the image)</span></label>
                                         <input wire:model="hotspots.{{ $i }}.pos_x" type="number" min="0" max="100" step="0.1" class="form-input" />
                                         @error('hotspots.'.$i.'.pos_x') <p class="form-error">{{ $message }}</p> @enderror
                                     </div>
                                     <div class="form-group" style="margin:0;">
-                                        <label class="form-label">Y % <span style="font-weight:400;color:var(--gray-lt);">(click image)</span></label>
+                                        <label class="form-label">Y % <span style="font-weight:400;color:var(--gray);">(or click the image)</span></label>
                                         <input wire:model="hotspots.{{ $i }}.pos_y" type="number" min="0" max="100" step="0.1" class="form-input" />
                                         @error('hotspots.'.$i.'.pos_y') <p class="form-error">{{ $message }}</p> @enderror
                                     </div>
