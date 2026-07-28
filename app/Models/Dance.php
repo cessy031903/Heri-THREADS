@@ -26,13 +26,24 @@ class Dance extends Model
 
     public function getEmbedUrlAttribute(): ?string
     {
-        if (! $this->video_url) {
+        return static::youtubeEmbedUrl($this->video_url);
+    }
+
+    /**
+     * Converts a YouTube URL (watch, youtu.be, shorts, or already-embed) to
+     * its embeddable form. Static so both the model and any form preview
+     * (e.g. ManageDances' live-typing embed preview, before a Dance exists)
+     * can share the same extraction logic instead of duplicating the regex.
+     */
+    public static function youtubeEmbedUrl(?string $videoUrl): ?string
+    {
+        if (! $videoUrl) {
             return null;
         }
         // Handles: youtube.com/watch?v=, youtu.be/, youtube.com/shorts/, youtube.com/embed/
         preg_match(
             '/(?:v=|youtu\.be\/|shorts\/|embed\/)([a-zA-Z0-9_-]{11})/',
-            $this->video_url,
+            $videoUrl,
             $m
         );
         return isset($m[1]) ? "https://www.youtube.com/embed/{$m[1]}" : null;

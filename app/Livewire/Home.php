@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Attire;
 use App\Models\Dance;
+use App\Support\PlaceholderPalette;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
@@ -58,14 +59,6 @@ class Home extends Component
 
     private function buildShowcaseItems(): array
     {
-        $palettes = [
-            ['#7B3A10', '#C4854A'],
-            ['#1A3A10', '#3A7A24'],
-            ['#5C1F1F', '#C85A17'],
-            ['#3A2A10', '#A0824D'],
-            ['#1A2A4A', '#3A6A95'],
-        ];
-
         $items = collect();
 
         // Dances first (most visual), then attires, preferring those with images.
@@ -106,8 +99,8 @@ class Home extends Component
         }
 
         return $items->take(5)->values()
-            ->map(function ($item, $i) use ($palettes) {
-                $item['palette'] = $palettes[$i % count($palettes)];
+            ->map(function ($item, $i) {
+                $item['palette'] = PlaceholderPalette::showcase($i);
                 return $item;
             })
             ->all();

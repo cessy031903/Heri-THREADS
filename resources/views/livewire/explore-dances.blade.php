@@ -55,9 +55,7 @@
         <section class="dance-grid-v2" wire:loading.delay.class="results-fading" wire:target="search,categoryFilter">
             @forelse($this->dances as $i => $dance)
                 @php
-                    $pals = [['#7B3A10','#C4854A'],['#5C1F1F','#C85A17'],['#1A3A10','#3A7A24'],['#3A2A10','#A0824D'],['#1A2A4A','#3A6A95'],['#4A1A2A','#A84060'],['#2A3A10','#7A9A3A'],['#3A1A10','#B07040']];
-                    $palIndex = abs((int) $dance->id) % count($pals);
-                    [$d, $l] = $pals[$palIndex];
+                    [$d, $l] = \App\Support\PlaceholderPalette::visitor($dance->id);
                     $delay = $loop->index * 70;
                     $catColors = ['vb-pagaddut', 'vb-hinggatut', 'vb-dinuya'];
                     $catKey = $catColors[abs(crc32((string) $dance->category)) % count($catColors)];
@@ -131,9 +129,7 @@
     @if($showModal && $this->selectedDance)
     @php
         $dance = $this->selectedDance;
-        $pals = [['#7B3A10','#C4854A'],['#5C1F1F','#C85A17'],['#1A3A10','#3A7A24'],['#3A2A10','#A0824D'],['#1A2A4A','#3A6A95'],['#4A1A2A','#A84060'],['#2A3A10','#7A9A3A'],['#3A1A10','#B07040']];
-        $palIndex = abs((int) $dance->id + 10) % count($pals);
-        [$md, $ml] = $pals[$palIndex];
+        [$md, $ml] = \App\Support\PlaceholderPalette::visitor($dance->id + 10);
         $mCatColors = ['vb-pagaddut', 'vb-hinggatut', 'vb-dinuya'];
         $mCatKey = $mCatColors[abs(crc32((string) $dance->category)) % count($mCatColors)];
         $tagline = collect([$dance->region, $dance->origin])->filter()->implode(' · ');
@@ -246,7 +242,7 @@
                         <p class="vis-modal-vid-label">◆ Related Dances</p>
                         <div class="dmodal-related">
                             @foreach($this->relatedDances as $rel)
-                                @php $relPalIndex = abs((int) $rel->id) % count($pals); [$rd, $rl] = $pals[$relPalIndex]; @endphp
+                                @php [$rd, $rl] = \App\Support\PlaceholderPalette::visitor($rel->id); @endphp
                                 <button type="button" class="rel-card" wire:click="selectDance({{ $rel->id }})" wire:key="rel-{{ $rel->id }}">
                                     <span class="rel-thumb" style="background:linear-gradient(148deg,{{ $rd }},{{ $rl }});">
                                         @if($rel->image_path)

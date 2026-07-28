@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Admin\Guides;
 
+use App\Caching\HomepageCache;
+use App\Enums\Municipality;
 use App\Models\Attire;
 use App\Models\AuditLog;
 use App\Models\GuideHotspot;
@@ -30,17 +32,19 @@ class ManageGuides extends Component
     // Nested hotspots (array of rows)
     public array $hotspots = [];
 
-    public array $municipalities = [
-        'Alfonso Lista', 'Aguinaldo', 'Asipulo', 'Banaue', 'Hingyon',
-        'Hungduan', 'Kiangan', 'Lagawe', 'Lamut', 'Mayoyao', 'Tinoc',
-    ];
+    /** @return list<string> */
+    #[Computed]
+    public function municipalities(): array
+    {
+        return Municipality::labels();
+    }
 
     protected function rules(): array
     {
         return [
             'municipality' => [
                 'required',
-                'in:Alfonso Lista,Aguinaldo,Asipulo,Banaue,Hingyon,Hungduan,Kiangan,Lagawe,Lamut,Mayoyao,Tinoc',
+                'in:'.Municipality::validationList(),
                 Rule::unique('interactive_guides', 'municipality')->ignore($this->editingId),
             ],
             'title'              => 'required|string|max:255',
@@ -206,6 +210,7 @@ class ManageGuides extends Component
         $this->showModal = false;
         $this->resetForm();
         unset($this->guides);
+        HomepageCache::flush();
     }
 
     public function delete(int $id): void
@@ -218,6 +223,7 @@ class ManageGuides extends Component
         $guide->delete();
         $this->dispatch('toast', message: "Guide \"{$guide->title}\" deleted.", type: 'success');
         unset($this->guides);
+        HomepageCache::flush();
     }
 
     private function resetForm(): void

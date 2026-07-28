@@ -15,10 +15,9 @@
             </div>
 
             <section class="mun-grid-v2" aria-label="Municipality selection">
-                @foreach($municipalities as $i => $muni)
+                @foreach($this->municipalities as $i => $muni)
                     @php
-                        $munPals = [['#7B3A10','#C4854A'],['#5C1F1F','#C85A17'],['#1A3A10','#3A7A24'],['#3A2A10','#A0824D'],['#1A2A4A','#3A6A95'],['#4A1A2A','#A84060'],['#2A3A10','#7A9A3A'],['#3A1A10','#B07040'],['#2A1A3A','#8A4AB0'],['#1A3A3A','#3A8A8A'],['#3A3A10','#9A9A3A']];
-                        [$md, $ml] = $munPals[$i % count($munPals)];
+                        [$md, $ml] = \App\Support\PlaceholderPalette::municipality($i);
                         $taglines = ['Alfonso Lista' => 'Gateway to Ifugao', 'Aguinaldo' => 'Where Traditions Breathe', 'Asipulo' => 'Land of the Mountain Springs', 'Banaue' => 'Home of the Eighth Wonder', 'Hingyon' => 'Village of the Weavers', 'Hungduan' => 'Heart of Highland Tradition', 'Kiangan' => 'Cradle of Ifugao Civilization', 'Lagawe' => 'Provincial Capital of Ifugao', 'Lamut' => 'Valley of Ancient Rites', 'Mayoyao' => 'Where Eagles Soar', 'Tinoc' => 'Land of the Tinoc Weavers'];
                         $tagline = $taglines[$muni] ?? 'Cultural Heritage Site';
                     @endphp
@@ -51,12 +50,11 @@
     @else
         {{-- ── ATTIRE DETAIL (profile-style header) ─────────────── --}}
         @php
-            $munPals = [['#7B3A10','#C4854A'],['#5C1F1F','#C85A17'],['#1A3A10','#3A7A24'],['#3A2A10','#A0824D'],['#1A2A4A','#3A6A95'],['#4A1A2A','#A84060'],['#2A3A10','#7A9A3A'],['#3A1A10','#B07040'],['#2A1A3A','#8A4AB0'],['#1A3A3A','#3A8A8A'],['#3A3A10','#9A9A3A']];
-            $munIdx = array_search($selectedMunicipality, $municipalities, true);
+            $munIdx = array_search($selectedMunicipality, $this->municipalities, true);
             if ($munIdx === false) {
                 $munIdx = 0;
             }
-            [$covD, $covL] = $munPals[$munIdx % count($munPals)];
+            [$covD, $covL] = \App\Support\PlaceholderPalette::municipality($munIdx);
             $taglines = ['Alfonso Lista' => 'Gateway to Ifugao', 'Aguinaldo' => 'Where Traditions Breathe', 'Asipulo' => 'Land of the Mountain Springs', 'Banaue' => 'Home of the Eighth Wonder', 'Hingyon' => 'Village of the Weavers', 'Hungduan' => 'Heart of Highland Tradition', 'Kiangan' => 'Cradle of Ifugao Civilization', 'Lagawe' => 'Provincial Capital of Ifugao', 'Lamut' => 'Valley of Ancient Rites', 'Mayoyao' => 'Where Eagles Soar', 'Tinoc' => 'Land of the Tinoc Weavers'];
             $munTagline = $taglines[$selectedMunicipality] ?? 'Cultural Heritage Site';
             $munInitials = mb_strtoupper(mb_substr(preg_replace('/\s+/u', '', $selectedMunicipality), 0, 2));
@@ -165,8 +163,7 @@
                     <div class="sec-line"></div>
                     @forelse($this->womenAttires as $i => $attire)
                         @php
-                            $aPals = $this->attirePals;
-                            [$ad, $al] = $aPals[abs((int) $attire->id) % count($aPals)];
+                            [$ad, $al] = \App\Support\PlaceholderPalette::visitor($attire->id);
                         @endphp
                         <article class="attire-card attire-card-clickable" style="animation-delay:{{ $i * 90 }}ms;"
                                  wire:click="selectAttire({{ $attire->id }})"
@@ -222,8 +219,7 @@
                     <div class="sec-line"></div>
                     @forelse($this->menAttires as $i => $attire)
                         @php
-                            $aPals = $this->attirePals;
-                            [$ad, $al] = $aPals[abs((int) $attire->id) % count($aPals)];
+                            [$ad, $al] = \App\Support\PlaceholderPalette::visitor($attire->id);
                         @endphp
                         <article class="attire-card attire-card-clickable" style="animation-delay:{{ $i * 90 }}ms;"
                                  wire:click="selectAttire({{ $attire->id }})"
@@ -279,8 +275,7 @@
     @if($showAttireModal && $this->selectedAttire)
     @php
         $attire = $this->selectedAttire;
-        $aPals = $this->attirePals;
-        [$amd, $aml] = $aPals[abs((int) $attire->id) % count($aPals)];
+        [$amd, $aml] = \App\Support\PlaceholderPalette::visitor($attire->id);
         $genderKey = $attire->gender === 'women' ? 'bf' : 'bm';
         $aTagline = collect([$attire->name_dialect, $attire->municipality])->filter()->implode(' · ');
     @endphp
@@ -353,7 +348,7 @@
                         <p class="vis-modal-vid-label">◆ More from {{ $attire->municipality }}</p>
                         <div class="dmodal-related">
                             @foreach($this->relatedAttires as $rel)
-                                @php [$rd, $rl] = $aPals[abs((int) $rel->id) % count($aPals)]; @endphp
+                                @php [$rd, $rl] = \App\Support\PlaceholderPalette::visitor($rel->id); @endphp
                                 <button type="button" class="rel-card" wire:click="selectAttire({{ $rel->id }})" wire:key="arel-{{ $rel->id }}">
                                     <span class="rel-thumb" style="background:linear-gradient(148deg,{{ $rd }},{{ $rl }});">
                                         @if($rel->image_path)

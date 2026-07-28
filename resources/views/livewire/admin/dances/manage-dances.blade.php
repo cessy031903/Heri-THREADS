@@ -58,10 +58,7 @@
                     @forelse($this->dances as $dance)
                         <tr wire:key="dance-{{ $dance->id }}">
                             <td>
-                                @php
-                                    $pals=[['#7B3A10','#D4A574'],['#5C1F1F','#C85A17'],['#1A3A10','#4A8A2C'],['#3A2A10','#B8925D'],['#1A2A4A','#4A7AB5'],['#4A1A2A','#C86090'],['#2A3A10','#8AB54A'],['#3A1A10','#C89060']];
-                                    $p=$pals[abs((int) $dance->id)%count($pals)];
-                                @endphp
+                                @php $p = \App\Support\PlaceholderPalette::admin($dance->id); @endphp
                                 @if($dance->image_path)
                                     <img src="{{ Storage::disk('public')->url($dance->image_path) }}"
                                          style="width:42px;height:42px;border-radius:6px;object-fit:cover;flex-shrink:0;"
@@ -152,7 +149,7 @@
                             <label class="form-label">Municipality <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
                             <select wire:model="municipality" class="form-input form-select">
                                 <option value="">Select a municipality</option>
-                                @foreach($categories as $m)
+                                @foreach($this->municipalityOptions as $m)
                                     <option value="{{ $m['id'] }}">{{ $m['name'] }}</option>
                                 @endforeach
                             </select>

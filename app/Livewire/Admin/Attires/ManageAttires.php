@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Attires;
 
 use App\Caching\HomepageCache;
+use App\Enums\Municipality;
 use App\Models\AuditLog;
 use App\Models\Attire;
 use Illuminate\Support\Facades\Storage;
@@ -45,7 +46,7 @@ class ManageAttires extends Component
         return [
             'name_general' => 'required|string|max:255',
             'name_dialect' => 'required|string|max:255',
-            'municipality' => 'required|in:Alfonso Lista,Aguinaldo,Asipulo,Banaue,Hingyon,Hungduan,Kiangan,Lagawe,Lamut,Mayoyao,Tinoc',
+            'municipality' => 'required|in:'.Municipality::validationList(),
             'gender'       => 'required|in:women,men',
             'description'  => 'required|string|max:1500',
             'material'              => 'nullable|string|max:255',
@@ -65,19 +66,12 @@ class ManageAttires extends Component
         ['key' => 'gender',        'label' => 'Gender',       'sortable' => true],
     ];
 
-    public array $municipalities = [
-        ['id' => 'Alfonso Lista', 'name' => 'Alfonso Lista'],
-        ['id' => 'Aguinaldo',     'name' => 'Aguinaldo'],
-        ['id' => 'Asipulo',       'name' => 'Asipulo'],
-        ['id' => 'Banaue',        'name' => 'Banaue'],
-        ['id' => 'Hingyon',       'name' => 'Hingyon'],
-        ['id' => 'Hungduan',      'name' => 'Hungduan'],
-        ['id' => 'Kiangan',       'name' => 'Kiangan'],
-        ['id' => 'Lagawe',        'name' => 'Lagawe'],
-        ['id' => 'Lamut',         'name' => 'Lamut'],
-        ['id' => 'Mayoyao',       'name' => 'Mayoyao'],
-        ['id' => 'Tinoc',         'name' => 'Tinoc'],
-    ];
+    /** @return list<array{id: string, name: string}> */
+    #[Computed]
+    public function municipalityOptions(): array
+    {
+        return Municipality::options();
+    }
 
     public array $genders = [
         ['id' => 'women', 'name' => "Women's"],

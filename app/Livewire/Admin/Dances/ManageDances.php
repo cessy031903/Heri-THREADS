@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Dances;
 
 use App\Caching\HomepageCache;
+use App\Enums\Municipality;
 use App\Models\AuditLog;
 use App\Models\Dance;
 use App\Services\VideoOptimizer;
@@ -49,7 +50,7 @@ class ManageDances extends Component
         return [
             'name'        => 'required|string|max:255',
             'category'    => 'required|in:pagaddut,hinggatut,dinuy-a',
-            'municipality' => 'nullable|in:aguinaldo,alista,asipulo,banaue,hingyon,hungduan,kiangan,lagawe,lamut,mayoyao,tinoc',
+            'municipality' => 'nullable|in:'.Municipality::validationList(),
             'description' => 'required|string|max:1000',
             'region'                => 'nullable|string|max:255',
             'origin'                => 'nullable|string|max:255',
@@ -80,32 +81,17 @@ class ManageDances extends Component
         ['id' => 'dinuy-a',   'name' => 'Dinuy-a'],
     ];
 
-    public array $categories = [
-        ['id' => 'aguinaldo',  'name' => 'Aguinaldo'],
-        ['id' => 'alista', 'name' => 'Alfonso Lista'],
-        ['id' => 'asipulo',   'name' => 'Asipulo'],
-        ['id' => 'banaue',  'name' => 'Banaue'],
-        ['id' => 'hingyon', 'name' => 'Hingyon'],
-        ['id' => 'hungduan',   'name' => 'Hungduan'],
-        ['id' => 'kiangan',  'name' => 'Kiangan'],
-        ['id' => 'lagawe', 'name' => 'Lagawe'],
-        ['id' => 'lamut',   'name' => 'Lamut'],
-        ['id' => 'mayoyao', 'name' => 'Mayoyao'],
-        ['id' => 'tinoc',   'name' => 'Tinoc'],
-    ];
+    /** @return list<array{id: string, name: string}> */
+    #[Computed]
+    public function municipalityOptions(): array
+    {
+        return Municipality::options();
+    }
 
     #[Computed]
     public function videoUrlEmbed(): ?string
     {
-        if (! $this->video_url) {
-            return null;
-        }
-        preg_match(
-            '/(?:v=|youtu\.be\/|shorts\/|embed\/)([a-zA-Z0-9_-]{11})/',
-            $this->video_url,
-            $m
-        );
-        return isset($m[1]) ? "https://www.youtube.com/embed/{$m[1]}" : null;
+        return Dance::youtubeEmbedUrl($this->video_url);
     }
 
     #[Computed]

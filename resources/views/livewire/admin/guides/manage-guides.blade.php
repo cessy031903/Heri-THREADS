@@ -75,7 +75,7 @@
                             <label class="form-label">Municipality *</label>
                             <select wire:model="municipality" class="form-input form-select {{ $errors->has('municipality') ? 'error' : '' }}">
                                 <option value="">Select municipality</option>
-                                @foreach($municipalities as $m)
+                                @foreach($this->municipalities as $m)
                                     <option value="{{ $m }}">{{ $m }}</option>
                                 @endforeach
                             </select>

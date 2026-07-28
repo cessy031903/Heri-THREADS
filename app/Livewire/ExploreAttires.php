@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\Municipality;
 use App\Models\Attire;
 use App\Models\InteractiveGuide;
 use Livewire\Attributes\Computed;
@@ -16,25 +17,12 @@ class ExploreAttires extends Component
     public ?int $selectedAttireId = null;
     public bool $showAttireModal = false;
 
-    public array $municipalities = [
-        'Alfonso Lista',
-        'Aguinaldo',
-        'Asipulo',
-        'Banaue',
-        'Hingyon',
-        'Hungduan',
-        'Kiangan',
-        'Lagawe',
-        'Lamut',
-        'Mayoyao',
-        'Tinoc',
-    ];
-
-    /** Deterministic gradient palette used to color placeholder cards by id. Single source shared across the view instead of being redeclared per section. */
-    public array $attirePals = [
-        ['#7B3A10', '#C4854A'], ['#5C1F1F', '#C85A17'], ['#1A3A10', '#3A7A24'], ['#3A2A10', '#A0824D'],
-        ['#1A2A4A', '#3A6A95'], ['#4A1A2A', '#A84060'], ['#2A3A10', '#7A9A3A'], ['#3A1A10', '#B07040'],
-    ];
+    /** @return list<string> */
+    #[Computed]
+    public function municipalities(): array
+    {
+        return Municipality::labels();
+    }
 
     #[Computed]
     public function womenAttires()
