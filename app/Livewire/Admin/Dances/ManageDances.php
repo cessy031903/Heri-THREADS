@@ -4,7 +4,7 @@ namespace App\Livewire\Admin\Dances;
 
 use App\Caching\HomepageCache;
 use App\Enums\Municipality;
-use App\Models\AuditLog;
+use App\Livewire\Concerns\ManagesCrudModal;
 use App\Models\Dance;
 use App\Services\VideoOptimizer;
 use Illuminate\Support\Facades\Storage;
@@ -15,7 +15,7 @@ use Livewire\WithPagination;
 
 class ManageDances extends Component
 {
-    use WithFileUploads, WithPagination;
+    use ManagesCrudModal, WithFileUploads, WithPagination;
 
     public bool $showModal  = false;
     public bool $isEditing  = false;
@@ -116,13 +116,6 @@ class ManageDances extends Component
         unset($this->dances);
     }
 
-    public function openCreate(): void
-    {
-        $this->resetForm();
-        $this->isEditing = false;
-        $this->showModal = true;
-    }
-
     public function openEdit(int $id): void
     {
         $dance = Dance::findOrFail($id);
@@ -154,26 +147,12 @@ class ManageDances extends Component
 
         $imagePath = null;
         if ($this->image) {
-            // Delete old image before storing new one (prevent storage leak)
-            if ($this->isEditing) {
-                $existing = Dance::find($this->editingId);
-                if ($existing?->image_path) {
-                    Storage::disk('public')->delete($existing->image_path);
-                }
-            }
-            $imagePath = $this->image->store('dances', 'public');
+            $imagePath = $this->replaceStoredFile($this->image, Dance::class, $this->editingId ?? 0, 'image_path', 'dances');
         }
 
         $videoPath = null;
         if ($this->video) {
-            // Delete old video before storing new one (prevent storage leak)
-            if ($this->isEditing) {
-                $existing = Dance::find($this->editingId);
-                if ($existing?->video_path) {
-                    Storage::disk('public')->delete($existing->video_path);
-                }
-            }
-            $videoPath = $this->video->store('dances-videos', 'public');
+            $videoPath = $this->replaceStoredFile($this->video, Dance::class, $this->editingId ?? 0, 'video_path', 'dances-videos');
             VideoOptimizer::faststart('public', $videoPath);
         } elseif ($this->isEditing && $this->removeExistingVideo && $this->existingVideoPath) {
             Storage::disk('public')->delete($this->existingVideoPath);
@@ -187,12 +166,10 @@ class ManageDances extends Component
                 $videoPath ? ['video_path' => $videoPath] : [],
                 (! $videoPath && $this->removeExistingVideo) ? ['video_path' => null] : []
             ));
-            AuditLog::record('update', 'dance', $dance->id, $dance->name);
-            $this->dispatch('toast', message: "Dance \"{$dance->name}\" updated.", type: 'success');
+            $this->logAndNotify('update', 'dance', $dance->id, $dance->name, 'updated');
         } else {
             $dance = Dance::create(array_merge($validated, ['image_path' => $imagePath, 'video_path' => $videoPath]));
-            AuditLog::record('create', 'dance', $dance->id, $dance->name);
-            $this->dispatch('toast', message: "Dance \"{$dance->name}\" added.", type: 'success');
+            $this->logAndNotify('create', 'dance', $dance->id, $dance->name, 'added');
         }
 
         $this->showModal = false;
@@ -210,9 +187,8 @@ class ManageDances extends Component
         if ($dance->video_path) {
             Storage::disk('public')->delete($dance->video_path);
         }
-        AuditLog::record('delete', 'dance', $dance->id, $dance->name);
         $dance->delete();
-        $this->dispatch('toast', message: "Dance \"{$dance->name}\" deleted.", type: 'success');
+        $this->logAndNotify('delete', 'dance', $dance->id, $dance->name, 'deleted');
         unset($this->dances);
         HomepageCache::flush();
     }

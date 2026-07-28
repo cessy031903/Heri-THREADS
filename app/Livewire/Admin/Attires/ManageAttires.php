@@ -4,7 +4,7 @@ namespace App\Livewire\Admin\Attires;
 
 use App\Caching\HomepageCache;
 use App\Enums\Municipality;
-use App\Models\AuditLog;
+use App\Livewire\Concerns\ManagesCrudModal;
 use App\Models\Attire;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
@@ -14,7 +14,7 @@ use Livewire\WithPagination;
 
 class ManageAttires extends Component
 {
-    use WithFileUploads, WithPagination;
+    use ManagesCrudModal, WithFileUploads, WithPagination;
 
     public bool $showModal = false;
     public bool $isEditing = false;
@@ -101,13 +101,6 @@ class ManageAttires extends Component
         unset($this->attires);
     }
 
-    public function openCreate(): void
-    {
-        $this->resetForm();
-        $this->isEditing = false;
-        $this->showModal = true;
-    }
-
     public function openEdit(int $id): void
     {
         $attire = Attire::findOrFail($id);
@@ -131,14 +124,7 @@ class ManageAttires extends Component
 
         $imagePath = null;
         if ($this->image) {
-            // Delete old image before storing new one (prevent storage leak)
-            if ($this->isEditing) {
-                $existing = Attire::find($this->editingId);
-                if ($existing?->image_path) {
-                    Storage::disk('public')->delete($existing->image_path);
-                }
-            }
-            $imagePath = $this->image->store('attires', 'public');
+            $imagePath = $this->replaceStoredFile($this->image, Attire::class, $this->editingId ?? 0, 'image_path', 'attires');
         }
 
         if ($this->isEditing) {
@@ -147,12 +133,10 @@ class ManageAttires extends Component
                 $validated,
                 $imagePath ? ['image_path' => $imagePath] : []
             ));
-            AuditLog::record('update', 'attire', $attire->id, $attire->name_general);
-            $this->dispatch('toast', message: "Attire \"{$attire->name_general}\" updated.", type: 'success');
+            $this->logAndNotify('update', 'attire', $attire->id, $attire->name_general, 'updated');
         } else {
             $attire = Attire::create(array_merge($validated, ['image_path' => $imagePath]));
-            AuditLog::record('create', 'attire', $attire->id, $attire->name_general);
-            $this->dispatch('toast', message: "Attire \"{$attire->name_general}\" added.", type: 'success');
+            $this->logAndNotify('create', 'attire', $attire->id, $attire->name_general, 'added');
         }
 
         $this->showModal = false;
@@ -167,9 +151,8 @@ class ManageAttires extends Component
         if ($attire->image_path) {
             Storage::disk('public')->delete($attire->image_path);
         }
-        AuditLog::record('delete', 'attire', $attire->id, $attire->name_general);
         $attire->delete();
-        $this->dispatch('toast', message: "Attire \"{$attire->name_general}\" deleted.", type: 'success');
+        $this->logAndNotify('delete', 'attire', $attire->id, $attire->name_general, 'deleted');
         unset($this->attires);
         HomepageCache::flush();
     }
