@@ -82,6 +82,17 @@
                 Interactive Guides
             </a>
 
+            <a href="{{ route('admin.showcase') }}" wire:navigate
+               class="sb-item {{ request()->routeIs('admin.showcase') ? 'active' : '' }}"
+               @click="sidebarOpen = false">
+                <span class="ico">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="14" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M3 15l4.5-4.5a1.5 1.5 0 012.12 0L14 14.9M14 13l1.5-1.5a1.5 1.5 0 012.12 0L21 15"/><circle cx="8.5" cy="8.5" r="1.25"/>
+                    </svg>
+                </span>
+                Home Showcase
+            </a>
+
             <div class="sb-section" style="margin-top:.875rem;">Site</div>
 
             <a href="{{ route('home') }}" target="_blank" class="sb-item" @click="sidebarOpen = false">

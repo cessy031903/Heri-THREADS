@@ -55,15 +55,13 @@
             </a>
         </div>
 
-        {{-- Visual separation between the text and the gallery --}}
-        <div class="hero-divider" aria-hidden="true"></div>
-
         {{-- Showcase carousel ────────────────────────────────────────
-             Images come from the database (dances/attires with uploads).
-             Missing images fall back to a themed gradient automatically.
+             Photos are curated by the admin (Manage Home Showcase), not
+             pulled from Dance/Attire records — see Home::buildShowcaseItems().
              Auto-advances right-to-left; centered card is highlighted;
              supports swipe/drag and prev/next arrows.
         ──────────────────────────────────────────────────────────── --}}
+        @if(count($this->showcaseItems))
         <div class="hero-carousel"
              x-data="heroCarousel({{ count($this->showcaseItems) }})"
              x-init="init()"
@@ -82,7 +80,7 @@
                  @pointerup="dragEnd($event)"
                  @pointercancel="dragEnd($event)">
                 @foreach($this->showcaseItems as $i => $item)
-                    <a href="{{ $item['href'] }}"
+                    <a @if($item['href']) href="{{ $item['href'] }}" @endif
                        class="hg-card"
                        :class="cardClass({{ $i }})"
                        :style="cardStyle({{ $i }})"
@@ -111,6 +109,7 @@
                 @endforeach
             </div>
         </div>
+        @endif
     </section>
 
     @push('scripts')
@@ -178,7 +177,8 @@
             },
             onCardClick(i, event) {
                 if (this.isCenter(i)) {
-                    window.location.href = event.currentTarget.href;
+                    const href = event.currentTarget.getAttribute('href');
+                    if (href) window.location.href = href;
                 } else {
                     this.goTo(i);
                 }

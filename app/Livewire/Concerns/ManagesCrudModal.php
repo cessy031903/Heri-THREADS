@@ -7,9 +7,10 @@ use Illuminate\Support\Facades\Storage;
 
 /**
  * Shared scaffolding for admin CRUD-with-modal Livewire components
- * (ManageDances, ManageAttires). Covers only what is genuinely identical
- * between them: opening the create modal, replacing a stored file without
- * leaking the old one, and the audit-log-plus-toast pair on write/delete.
+ * (ManageDances, ManageAttires, ManageShowcase). Covers only what is
+ * genuinely identical between them: opening the create modal, replacing a
+ * stored file without leaking the old one, and the audit-log-plus-toast
+ * pair on write/delete.
  *
  * Deliberately does not attempt to unify save()/resetForm()/openEdit(),
  * since those differ per-model (fields, extra file types, validation) in

@@ -23,4 +23,5 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dances',    \App\Livewire\Admin\Dances\ManageDances::class)->name('dances');
     Route::get('/attires',   \App\Livewire\Admin\Attires\ManageAttires::class)->name('attires');
     Route::get('/guides',    \App\Livewire\Admin\Guides\ManageGuides::class)->name('guides');
+    Route::get('/showcase',  \App\Livewire\Admin\Showcase\ManageShowcase::class)->name('showcase');
 });

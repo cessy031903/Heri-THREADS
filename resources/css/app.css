@@ -1177,16 +1177,6 @@ body.heri-surface .mob-nav {
 }
 .hero-btn:active { transform: translateY(-1px); }
 
-/* ── Divider between text and gallery */
-.hero-divider {
-  position: relative;
-  z-index: 2;
-  width: min(220px, 40vw);
-  height: 1px;
-  margin: 3rem auto 2.75rem;
-  background: linear-gradient(90deg, transparent, rgba(212,165,116,.45), transparent);
-}
-
 /* ── Showcase carousel */
 .hero-carousel {
   position: relative;
@@ -1329,7 +1319,6 @@ body.heri-surface .mob-nav {
 }
 @media (max-width: 560px) {
   .hero { padding: 6rem 1rem 2.5rem; }
-  .hero-divider { margin: 2.25rem auto 2rem; }
   .hero-ttl { font-size: clamp(1.75rem, 7vw, 2.5rem); }
   .hg-card { width: clamp(118px, 32vw, 190px); }
   .hg-label { font-size: 0.82rem; }
