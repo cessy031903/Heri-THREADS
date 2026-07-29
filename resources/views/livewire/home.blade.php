@@ -58,29 +58,150 @@
         {{-- Visual separation between the text and the gallery --}}
         <div class="hero-divider" aria-hidden="true"></div>
 
-        {{-- Showcase gallery (5 fanned cards) ─────────────────────────
+        {{-- Showcase carousel ────────────────────────────────────────
              Images come from the database (dances/attires with uploads).
              Missing images fall back to a themed gradient automatically.
+             Auto-advances right-to-left; centered card is highlighted;
+             supports swipe/drag and prev/next arrows.
         ──────────────────────────────────────────────────────────── --}}
-        <div class="hero-gallery">
-            @foreach($this->showcaseItems as $i => $item)
-                <a href="{{ $item['href'] }}"
-                   class="hg-card hg-card-{{ $i }} js-hg-card"
-                   style="--hg-a: {{ $item['palette'][0] }}; --hg-b: {{ $item['palette'][1] }};">
-                    @if($item['image'])
-                        <img src="{{ $item['image'] }}" alt="{{ $item['label'] }}"
-                             class="hg-img" loading="lazy"
-                             onerror="this.style.display='none'">
-                    @endif
-                    <div class="hg-shade" aria-hidden="true"></div>
-                    <div class="hg-text">
-                        <span class="hg-sub">{{ $item['sub'] }}</span>
-                        <span class="hg-label">{{ $item['label'] }}</span>
-                    </div>
-                </a>
-            @endforeach
+        <div class="hero-carousel"
+             x-data="heroCarousel({{ count($this->showcaseItems) }})"
+             x-init="init()"
+             @mouseenter="pause()" @mouseleave="resume()"
+             @keydown.left="prev()" @keydown.right="next()"
+             tabindex="0"
+             role="region"
+             aria-roledescription="carousel"
+             aria-label="Featured dances and attires">
+
+            <button type="button" class="hc-arrow hc-arrow-prev" @click="prev()" aria-label="Previous">‹</button>
+
+            <div class="hc-track"
+                 @pointerdown="dragStart($event)"
+                 @pointermove="dragMove($event)"
+                 @pointerup="dragEnd($event)"
+                 @pointercancel="dragEnd($event)">
+                @foreach($this->showcaseItems as $i => $item)
+                    <a href="{{ $item['href'] }}"
+                       class="hg-card js-hg-card"
+                       :class="cardClass({{ $i }})"
+                       :style="cardStyle({{ $i }})"
+                       style="--hg-a: {{ $item['palette'][0] }}; --hg-b: {{ $item['palette'][1] }};"
+                       @click.prevent="onCardClick({{ $i }}, $event)">
+                        @if($item['image'])
+                            <img src="{{ $item['image'] }}" alt="{{ $item['label'] }}"
+                                 class="hg-img" loading="lazy"
+                                 onerror="this.style.display='none'">
+                        @endif
+                        <div class="hg-shade" aria-hidden="true"></div>
+                        <div class="hg-text">
+                            <span class="hg-sub">{{ $item['sub'] }}</span>
+                            <span class="hg-label">{{ $item['label'] }}</span>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+
+            <button type="button" class="hc-arrow hc-arrow-next" @click="next()" aria-label="Next">›</button>
+
+            <div class="hc-dots" role="tablist" aria-label="Slide position">
+                @foreach($this->showcaseItems as $i => $item)
+                    <button type="button" class="hc-dot" :class="{ 'hc-dot-active': isCenter({{ $i }}) }"
+                            @click="goTo({{ $i }})" aria-label="Go to slide {{ $i + 1 }}"></button>
+                @endforeach
+            </div>
         </div>
     </section>
+
+    @push('scripts')
+    <script>
+    function heroCarousel(count) {
+        return {
+            count: count,
+            center: 0,
+            timer: null,
+            paused: false,
+            dragX: null,
+            dragging: false,
+
+            init() {
+                this.play();
+            },
+            play() {
+                clearInterval(this.timer);
+                this.timer = setInterval(() => {
+                    if (! this.paused) this.next();
+                }, 4000);
+            },
+            pause() { this.paused = true; },
+            resume() { this.paused = false; },
+            pauseThenResume() {
+                this.pause();
+                clearTimeout(this._resumeT);
+                this._resumeT = setTimeout(() => this.resume(), 5000);
+            },
+            next() { this.center = (this.center + 1) % this.count; },
+            prev() { this.center = (this.center - 1 + this.count) % this.count; },
+            goTo(i) { this.center = i; this.pauseThenResume(); },
+            onCardClick(i, event) {
+                if (this.isCenter(i)) {
+                    window.location.href = event.currentTarget.href;
+                } else {
+                    this.goTo(i);
+                }
+            },
+            isCenter(i) { return i === this.center; },
+
+            // Signed shortest circular distance from center, e.g. -2..-1,0,1..2
+            offsetOf(i) {
+                const half = this.count / 2;
+                let d = i - this.center;
+                if (d > half) d -= this.count;
+                if (d < -half) d += this.count;
+                return d;
+            },
+            cardClass(i) {
+                const d = this.offsetOf(i);
+                return {
+                    'hg-card-center': d === 0,
+                    'hg-card-hidden': Math.abs(d) > 2,
+                };
+            },
+            cardStyle(i) {
+                const d = this.offsetOf(i);
+                if (Math.abs(d) > 2) {
+                    return 'opacity:0; pointer-events:none; transform:translateX(0) scale(.7);';
+                }
+                const spacing = window.innerWidth < 560 ? 92 : (window.innerWidth < 760 ? 128 : 168);
+                const x = d * spacing;
+                const scale = d === 0 ? 1.08 : 1 - Math.abs(d) * 0.12;
+                const rotate = d * 6;
+                const y = Math.abs(d) * 20;
+                const z = 10 - Math.abs(d);
+                return `transform: translateX(${x}px) translateY(${y}px) scale(${scale}) rotate(${rotate}deg); z-index:${z};`;
+            },
+
+            dragStart(e) {
+                this.dragging = true;
+                this.dragX = e.clientX;
+                this.pause();
+            },
+            dragMove(e) {
+                if (! this.dragging || this.dragX === null) return;
+            },
+            dragEnd(e) {
+                if (! this.dragging || this.dragX === null) { this.dragging = false; return; }
+                const delta = e.clientX - this.dragX;
+                if (delta > 40) this.prev();
+                else if (delta < -40) this.next();
+                this.dragging = false;
+                this.dragX = null;
+                this.pauseThenResume();
+            },
+        };
+    }
+    </script>
+    @endpush
 
     @push('scripts')
     <script>

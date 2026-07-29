@@ -46,10 +46,13 @@ class Home extends Component
         return Dance::inRandomOrder()->first();
     }
 
+    /** Number of items the showcase carousel cycles through. */
+    private const SHOWCASE_SIZE = 10;
+
     /**
-     * Up to 5 visual items for the homepage showcase gallery.
+     * Visual items for the homepage showcase carousel.
      * Prefers records that have an uploaded image; falls back to themed
-     * gradient placeholders so the gallery always looks complete.
+     * gradient placeholders so the carousel always looks complete.
      */
     #[Computed]
     public function showcaseItems(): array
@@ -62,7 +65,7 @@ class Home extends Component
         $items = collect();
 
         // Dances first (most visual), then attires, preferring those with images.
-        Dance::query()->orderByRaw('image_path is null')->take(5)->get()
+        Dance::query()->orderByRaw('image_path is null')->take(self::SHOWCASE_SIZE)->get()
             ->each(function ($d) use (&$items) {
                 $items->push([
                     'label' => $d->name,
@@ -72,8 +75,8 @@ class Home extends Component
                 ]);
             });
 
-        if ($items->count() < 5) {
-            Attire::query()->whereNotNull('image_path')->take(5 - $items->count())->get()
+        if ($items->count() < self::SHOWCASE_SIZE) {
+            Attire::query()->whereNotNull('image_path')->take(self::SHOWCASE_SIZE - $items->count())->get()
                 ->each(function ($a) use (&$items) {
                     $items->push([
                         'label' => $a->name_general,
@@ -84,21 +87,26 @@ class Home extends Component
                 });
         }
 
-        // Pad to exactly 5 slots with culturally themed placeholders.
+        // Pad up to SHOWCASE_SIZE slots with culturally themed placeholders.
         $placeholders = [
             ['label' => 'Sacred Dances',  'sub' => 'Ritual',        'href' => route('dances')],
             ['label' => 'Woven Attires',  'sub' => 'Textiles',      'href' => route('attires')],
             ['label' => 'Banaue',         'sub' => 'Eighth Wonder', 'href' => route('attires')],
             ['label' => 'Kiangan',        'sub' => 'Heritage',      'href' => route('attires')],
             ['label' => 'Hungduan',       'sub' => 'Highland',      'href' => route('attires')],
+            ['label' => 'Lagawe',         'sub' => 'Provincial Capital', 'href' => route('attires')],
+            ['label' => 'Aguinaldo',      'sub' => 'Traditions',    'href' => route('attires')],
+            ['label' => 'Asipulo',        'sub' => 'Mountain Springs', 'href' => route('attires')],
+            ['label' => 'Hingyon',        'sub' => 'Village of Weavers', 'href' => route('attires')],
+            ['label' => 'Mayoyao',        'sub' => 'Where Eagles Soar', 'href' => route('attires')],
         ];
         $p = 0;
-        while ($items->count() < 5) {
+        while ($items->count() < self::SHOWCASE_SIZE) {
             $items->push(array_merge($placeholders[$p % count($placeholders)], ['image' => null]));
             $p++;
         }
 
-        return $items->take(5)->values()
+        return $items->take(self::SHOWCASE_SIZE)->values()
             ->map(function ($item, $i) {
                 $item['palette'] = PlaceholderPalette::showcase($i);
                 return $item;

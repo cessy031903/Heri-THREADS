@@ -31,38 +31,77 @@
             <div class="sf-brand">
                 <a href="{{ route('home') }}" class="sf-logo">Heri<span class="gem">◆</span>THREADS</a>
                 <p class="sf-blurb">
-                    A living digital archive preserving the traditional dances and woven attires
-                    of Ifugao's eleven municipalities for generations to come.
+                    <span x-show="!$store.app || $store.app.lang === 'en'">A living digital archive preserving the traditional dances and woven attires
+                    of Ifugao's eleven municipalities for generations to come.</span>
+                    <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Isang buhay na digital na arkibo na nag-iingat ng mga tradisyonal na sayaw
+                    at hinabing kasuotan ng labing-isang munisipalidad ng Ifugao para sa susunod na salinlahi.</span>
                 </p>
             </div>
 
             <div class="sf-col">
-                <p class="sf-col-title">Explore</p>
-                <a href="{{ route('home') }}" class="sf-link">Home</a>
-                <a href="{{ route('dances') }}" class="sf-link">Dances</a>
-                <a href="{{ route('attires') }}" class="sf-link">Attires</a>
+                <p class="sf-col-title">
+                    <span x-show="!$store.app || $store.app.lang === 'en'">Explore</span>
+                    <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Tuklasin</span>
+                </p>
+                <a href="{{ route('home') }}" class="sf-link">
+                    <span x-show="!$store.app || $store.app.lang === 'en'">Home</span>
+                    <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Tahanan</span>
+                </a>
+                <a href="{{ route('dances') }}" class="sf-link">
+                    <span x-show="!$store.app || $store.app.lang === 'en'">Dances</span>
+                    <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Mga Sayaw</span>
+                </a>
+                <a href="{{ route('attires') }}" class="sf-link">
+                    <span x-show="!$store.app || $store.app.lang === 'en'">Attires</span>
+                    <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Mga Kasuotan</span>
+                </a>
             </div>
 
             <div class="sf-col">
-                <p class="sf-col-title">Archive</p>
-                <a href="{{ route('attires') }}" class="sf-link">Municipalities</a>
-                <a href="{{ route('dances') }}" class="sf-link">Sacred Dances</a>
-                <a href="{{ route('login') }}" class="sf-link">Admin Access</a>
+                <p class="sf-col-title">
+                    <span x-show="!$store.app || $store.app.lang === 'en'">Archive</span>
+                    <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Arkibo</span>
+                </p>
+                <a href="{{ route('attires') }}" class="sf-link">
+                    <span x-show="!$store.app || $store.app.lang === 'en'">Municipalities</span>
+                    <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Mga Munisipalidad</span>
+                </a>
+                <a href="{{ route('dances') }}" class="sf-link">
+                    <span x-show="!$store.app || $store.app.lang === 'en'">Sacred Dances</span>
+                    <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Mga Sagradong Sayaw</span>
+                </a>
+                <a href="{{ route('login') }}" class="sf-link">
+                    <span x-show="!$store.app || $store.app.lang === 'en'">Admin Access</span>
+                    <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Admin Access</span>
+                </a>
             </div>
 
             <div class="sf-col sf-col-wide">
-                <p class="sf-col-title">Stay connected</p>
-                <p class="sf-note">Heritage notes and new additions to the archive.</p>
+                <p class="sf-col-title">
+                    <span x-show="!$store.app || $store.app.lang === 'en'">Stay connected</span>
+                    <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Manatiling Nakakonekta</span>
+                </p>
+                <p class="sf-note">
+                    <span x-show="!$store.app || $store.app.lang === 'en'">Heritage notes and new additions to the archive.</span>
+                    <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Mga tala ng pamana at bagong idinagdag sa arkibo.</span>
+                </p>
                 <form class="sf-news" onsubmit="return false;">
-                    <input type="email" class="sf-news-input" placeholder="Your email" aria-label="Email address">
-                    <button type="submit" class="sf-news-btn">Subscribe</button>
+                    <input type="email" class="sf-news-input" aria-label="Email address"
+                           :placeholder="(!$store.app || $store.app.lang === 'en') ? 'Your email' : 'Iyong email'">
+                    <button type="submit" class="sf-news-btn">
+                        <span x-show="!$store.app || $store.app.lang === 'en'">Subscribe</span>
+                        <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Mag-subscribe</span>
+                    </button>
                 </form>
             </div>
         </div>
 
         <div class="sf-bottom">
             <span>&copy; {{ date('Y') }} Heri◆THREADS — Ifugao Cultural Archive</span>
-            <span class="sf-bottom-note">For educational and cultural preservation purposes.</span>
+            <span class="sf-bottom-note">
+                <span x-show="!$store.app || $store.app.lang === 'en'">For educational and cultural preservation purposes.</span>
+                <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Para sa layuning pang-edukasyon at preserbasyong pangkultura.</span>
+            </span>
         </div>
     </footer>
 

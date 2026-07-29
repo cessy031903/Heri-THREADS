@@ -1173,44 +1173,86 @@ body.heri-surface .mob-nav {
   background: linear-gradient(90deg, transparent, rgba(212,165,116,.45), transparent);
 }
 
-/* ── Showcase gallery (fanned cards) */
-.hero-gallery {
+/* ── Showcase carousel */
+.hero-carousel {
   position: relative;
   z-index: 2;
   display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: flex-end;
+  gap: 0.5rem;
   width: 100%;
   padding-top: 1.5rem;
+  outline: none;
 }
-.hg-card {
+.hc-track {
   position: relative;
+  flex: 1 1 auto;
+  height: clamp(200px, 24vw, 330px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: pan-y;
+  overflow: hidden;
+}
+.hc-arrow {
+  flex: 0 0 auto;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.85);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 200ms ease, transform 200ms ease;
+  z-index: 20;
+}
+.hc-arrow:hover { background: rgba(255,255,255,.14); transform: scale(1.08); }
+.hc-arrow:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.hc-dots {
+  position: absolute;
+  left: 0; right: 0; bottom: -1.75rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+}
+.hc-dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,.25);
+  cursor: pointer;
+  padding: 0;
+  transition: background 200ms ease, transform 200ms ease;
+}
+.hc-dot-active { background: var(--gold); transform: scale(1.4); }
+
+.hg-card {
+  position: absolute;
   flex: 0 0 auto;
   width: clamp(150px, 18vw, 248px);
   aspect-ratio: 3 / 4;
   border-radius: 1.5rem;
   overflow: hidden;
-  margin-inline: -0.4rem;
   background: linear-gradient(155deg, var(--hg-a, #5C1F1F) 0%, var(--hg-b, #C85A17) 100%);
   border: 1px solid rgba(255,255,255,.08);
   box-shadow: 0 24px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.03) inset;
   text-decoration: none;
-  transform-origin: bottom center;
-  transition: transform 380ms cubic-bezier(.22,1,.36,1),
+  cursor: pointer;
+  transition: transform 480ms cubic-bezier(.22,1,.36,1),
+              opacity 480ms cubic-bezier(.22,1,.36,1),
               box-shadow 380ms cubic-bezier(.22,1,.36,1);
 }
-/* Fan arrangement: center highest, edges tilt outward + drop */
-.hg-card-0 { transform: rotate(-12deg) translateY(44px); z-index: 1; }
-.hg-card-1 { transform: rotate(-6deg)  translateY(14px); z-index: 2; }
-.hg-card-2 { transform: translateY(-10px) scale(1.08);   z-index: 3;
-             box-shadow: 0 34px 80px rgba(0,0,0,.6), 0 0 70px rgba(93,112,82,.12); }
-.hg-card-3 { transform: rotate(6deg)   translateY(14px); z-index: 2; }
-.hg-card-4 { transform: rotate(12deg)  translateY(44px); z-index: 1; }
-.hg-card:hover {
-  z-index: 6;
-  transform: translateY(-14px) scale(1.1) rotate(0deg);
-  box-shadow: 0 40px 90px rgba(0,0,0,.6), 0 0 80px rgba(93,112,82,.18);
+.hg-card-center {
+  box-shadow: 0 34px 80px rgba(0,0,0,.6), 0 0 70px rgba(93,112,82,.12);
 }
+.hg-card-hidden { opacity: 0 !important; }
 .hg-img {
   position: absolute;
   inset: 0;
@@ -1251,23 +1293,16 @@ body.heri-surface .mob-nav {
 
 /* ── Responsive */
 @media (max-width: 760px) {
-  .hg-card { margin-inline: -0.4rem; border-radius: 1.25rem; }
-  .hg-card-0 { transform: rotate(-9deg) translateY(26px); }
-  .hg-card-1 { transform: rotate(-5deg) translateY(8px); }
-  .hg-card-3 { transform: rotate(5deg)  translateY(8px); }
-  .hg-card-4 { transform: rotate(9deg)  translateY(26px); }
+  .hg-card { border-radius: 1.25rem; }
+  .hc-arrow { width: 2.1rem; height: 2.1rem; font-size: 1.2rem; }
 }
 @media (max-width: 560px) {
   .hero { padding: 6rem 1rem 2.5rem; }
   .hero-divider { margin: 2.25rem auto 2rem; }
   .hero-ttl { font-size: clamp(1.75rem, 7vw, 2.5rem); }
-  /* Drop the two outermost cards on very small screens for clarity */
-  .hg-card-0, .hg-card-4 { display: none; }
-  .hg-card { width: clamp(96px, 26vw, 150px); margin-inline: -0.3rem; }
-  .hg-card-1 { transform: rotate(-7deg) translateY(14px); }
-  .hg-card-2 { transform: translateY(-4px) scale(1.06); }
-  .hg-card-3 { transform: rotate(7deg)  translateY(14px); }
+  .hg-card { width: clamp(96px, 26vw, 150px); }
   .hg-label { font-size: 0.82rem; }
+  .hc-arrow { display: none; }
 }
 
 /* ── DANCE PAGE (DARK) ───────────────────────────────────────── */
