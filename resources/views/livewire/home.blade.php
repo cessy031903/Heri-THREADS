@@ -23,7 +23,6 @@
             <div class="hero-photo-shade"></div>
             <div class="hero-orb hero-orb-1"></div>
             <div class="hero-orb hero-orb-2"></div>
-            <div class="hero-grid"></div>
         </div>
 
         {{-- Text content --}}
@@ -62,6 +61,9 @@
              supports swipe/drag and prev/next arrows.
         ──────────────────────────────────────────────────────────── --}}
         @if(count($this->showcaseItems))
+        {{-- Visual separation between the text and the carousel --}}
+        <div class="hero-divider" aria-hidden="true"></div>
+
         <div class="hero-carousel"
              x-data="heroCarousel({{ count($this->showcaseItems) }})"
              x-init="init()"
