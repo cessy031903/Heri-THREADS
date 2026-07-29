@@ -83,7 +83,7 @@
                  @pointercancel="dragEnd($event)">
                 @foreach($this->showcaseItems as $i => $item)
                     <a href="{{ $item['href'] }}"
-                       class="hg-card js-hg-card"
+                       class="hg-card"
                        :class="cardClass({{ $i }})"
                        :style="cardStyle({{ $i }})"
                        style="--hg-a: {{ $item['palette'][0] }}; --hg-b: {{ $item['palette'][1] }};"
@@ -140,9 +140,42 @@
                 clearTimeout(this._resumeT);
                 this._resumeT = setTimeout(() => this.resume(), 5000);
             },
-            next() { this.center = (this.center + 1) % this.count; },
-            prev() { this.center = (this.center - 1 + this.count) % this.count; },
-            goTo(i) { this.center = i; this.pauseThenResume(); },
+            moving: false,
+            stepTimer: null,
+
+            next() { this.step(1); },
+            prev() { this.step(-1); },
+            step(dir) {
+                this.center = (this.center + dir + this.count) % this.count;
+            },
+            // Blur is only for an actual swipe/drag gesture, not every
+            // programmatic advance (timer tick, arrow click, dot jump).
+            flashMoving() {
+                this.moving = true;
+                clearTimeout(this._moveT);
+                this._moveT = setTimeout(() => { this.moving = false; }, 500);
+            },
+            // Walk one card at a time toward target, instead of snapping
+            // straight there, so jumping several cards away still reads as
+            // a single continuous scroll rather than a teleport.
+            goTo(i) {
+                if (i === this.center) return;
+                this.pauseThenResume();
+                clearInterval(this.stepTimer);
+                const stepOnce = () => {
+                    if (this.center === i) {
+                        clearInterval(this.stepTimer);
+                        return;
+                    }
+                    const half = this.count / 2;
+                    let d = i - this.center;
+                    if (d > half) d -= this.count;
+                    if (d < -half) d += this.count;
+                    this.step(d > 0 ? 1 : -1);
+                };
+                stepOnce();
+                this.stepTimer = setInterval(stepOnce, 260);
+            },
             onCardClick(i, event) {
                 if (this.isCenter(i)) {
                     window.location.href = event.currentTarget.href;
@@ -165,6 +198,7 @@
                 return {
                     'hg-card-center': d === 0,
                     'hg-card-hidden': Math.abs(d) > 2,
+                    'hg-card-moving': this.moving,
                 };
             },
             cardStyle(i) {
@@ -172,9 +206,9 @@
                 if (Math.abs(d) > 2) {
                     return 'opacity:0; pointer-events:none; transform:translateX(0) scale(.7);';
                 }
-                const spacing = window.innerWidth < 560 ? 92 : (window.innerWidth < 760 ? 128 : 168);
+                const spacing = window.innerWidth < 560 ? 124 : (window.innerWidth < 760 ? 172 : 224);
                 const x = d * spacing;
-                const scale = d === 0 ? 1.08 : 1 - Math.abs(d) * 0.12;
+                const scale = d === 0 ? 1.14 : 1 - Math.abs(d) * 0.12;
                 const rotate = d * 6;
                 const y = Math.abs(d) * 20;
                 const z = 10 - Math.abs(d);
@@ -192,6 +226,7 @@
             dragEnd(e) {
                 if (! this.dragging || this.dragX === null) { this.dragging = false; return; }
                 const delta = e.clientX - this.dragX;
+                if (delta > 40 || delta < -40) this.flashMoving();
                 if (delta > 40) this.prev();
                 else if (delta < -40) this.next();
                 this.dragging = false;
@@ -214,9 +249,13 @@
                 .from('.js-hero-ttl', { y: 30, opacity: 0, duration: 0.75 }, '-=0.35')
                 .from('.js-hero-sub', { y: 20, opacity: 0, duration: 0.65 }, '-=0.45')
                 .from('.js-hero-btn', { y: 14, opacity: 0, scale: 0.94,
-                                        duration: 0.55, ease: 'back.out(1.7)' }, '-=0.4')
-                .from('.js-hg-card', { y: 40, opacity: 0, duration: 0.7,
-                                       stagger: 0.09, ease: 'power3.out' }, '-=0.25');
+                                        duration: 0.55, ease: 'back.out(1.7)' }, '-=0.4');
+            // Carousel cards are excluded from this GSAP timeline: Alpine owns
+            // their transform/opacity permanently via :style="cardStyle()", so
+            // GSAP writing inline styles to the same elements would race with
+            // and get overwritten by Alpine's own reactive binding. The entrance
+            // reveal is a CSS animation on the .hero-carousel wrapper instead
+            // (see app.css).
         }
 
         if (document.readyState === 'loading') {
