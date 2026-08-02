@@ -1,7 +1,13 @@
 <div>
     @if(! $selectedMunicipality)
         {{-- ── MUNICIPALITY SELECTION ──────────────────────────── --}}
-        <div class="vis-page-dark anim-fade-up" wire:key="mun-select">
+        <div class="vis-page-dark anim-fade-up" wire:key="mun-select"
+             x-data="{
+                previewUrl: null,
+                openPreview(url) { this.previewUrl = url; },
+                closePreview() { this.previewUrl = null; }
+             }"
+             @keydown.escape.window="previewUrl && closePreview()">
             <div class="vis-page-hd">
                 <p class="vis-eyebrow">Ifugao Cultural Archive</p>
                 <h1 class="vis-page-title">
@@ -14,44 +20,23 @@
                 </p>
             </div>
 
-            <section class="mun-grid-v2" aria-label="Municipality selection">
+            <section class="dance-grid-v2" aria-label="Municipality selection">
                 @foreach($this->municipalities as $i => $muni)
                     @php
-                        [$md, $ml] = \App\Support\PlaceholderPalette::municipality($i);
                         $taglines = ['Alfonso Lista' => 'Gateway to Ifugao', 'Aguinaldo' => 'Where Traditions Breathe', 'Asipulo' => 'Land of the Mountain Springs', 'Banaue' => 'Home of the Eighth Wonder', 'Hingyon' => 'Village of the Weavers', 'Hungduan' => 'Heart of Highland Tradition', 'Kiangan' => 'Cradle of Ifugao Civilization', 'Lagawe' => 'Provincial Capital of Ifugao', 'Lamut' => 'Valley of Ancient Rites', 'Mayoyao' => 'Where Eagles Soar', 'Tinoc' => 'Land of the Tinoc Weavers'];
                         $tagline = $taglines[$muni] ?? 'Cultural Heritage Site';
                         $cardImage = $this->municipalityCardImages[$muni] ?? null;
                     @endphp
-                    <article class="mun-card-v2 anim-fade-up"
-                             style="animation-delay:{{ $i * 80 }}ms;"
-                             wire:click="selectMunicipality('{{ $muni }}')"
-                             @keydown.enter="$wire.selectMunicipality('{{ $muni }}')"
-                             @keydown.space.prevent="$wire.selectMunicipality('{{ $muni }}')"
-                             role="button" tabindex="0"
-                             aria-label="Explore {{ $muni }}">
-                        <div style="position:absolute;inset:0;background:linear-gradient(148deg,{{ $md }} 0%,{{ $ml }} 100%);">
-                            <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 80 80" preserveAspectRatio="xMidYMid slice">
-                                <defs><pattern id="mpt{{ $i }}" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><polygon points="10,1 19,10 10,19 1,10" fill="none" stroke="white" stroke-width="1.3" opacity="0.09"/><circle cx="10" cy="10" r="1.8" fill="white" opacity="0.063"/><line x1="0" y1="10" x2="20" y2="10" stroke="white" stroke-width=".35" opacity="0.036"/><line x1="10" y1="0" x2="10" y2="20" stroke="white" stroke-width=".35" opacity="0.036"/></pattern></defs>
-                                <rect width="80" height="80" fill="url(#mpt{{ $i }})"/>
-                            </svg>
-                        </div>
-                        @if($cardImage)
-                            <img src="{{ $cardImage }}" alt="" aria-hidden="true"
-                                 style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"
-                                 loading="lazy" onerror="this.style.display='none'">
-                            <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(8,5,3,.75) 0%, rgba(8,5,3,.2) 55%, rgba(8,5,3,.35) 100%);"></div>
-                        @endif
-                        <div class="mun2-content">
-                            <h2 class="mun2-name">{{ $muni }}</h2>
-                            <p class="mun2-tag">{{ $tagline }}</p>
-                            <span class="mun2-cta">
-                                <span x-show="!$store.app || $store.app.lang === 'en'">Explore Attire →</span>
-                                <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Tuklasin →</span>
-                            </span>
-                        </div>
-                    </article>
+                    <x-visitor.municipality-card-v2
+                        :muni="$muni"
+                        :index="$i"
+                        :tagline="$tagline"
+                        :card-image="$cardImage" />
                 @endforeach
             </section>
+
+            {{-- Municipality card image lightbox --}}
+            <x-visitor.photo-lightbox />
         </div>
 
     @else
@@ -67,7 +52,13 @@
             $munInitials = mb_strtoupper(mb_substr(preg_replace('/\s+/u', '', $selectedMunicipality), 0, 2));
         @endphp
 
-        <div class="mun-profile-page anim-fade-up" wire:key="mun-detail-{{ $selectedMunicipality }}">
+        <div class="mun-profile-page anim-fade-up" wire:key="mun-detail-{{ $selectedMunicipality }}"
+             x-data="{
+                previewUrl: null,
+                openPreview(url) { this.previewUrl = url; },
+                closePreview() { this.previewUrl = null; }
+             }"
+             @keydown.escape.window="previewUrl && closePreview()">
             <div class="mun-profile-cover" style="--cov-a: {{ $covD }}; --cov-b: {{ $covL }};">
                 <div class="mun-profile-cover-bg" aria-hidden="true">
                     <svg class="mun-cover-svg" viewBox="0 0 80 80" preserveAspectRatio="xMidYMid slice">
@@ -168,53 +159,16 @@
                         <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Kasuotan ng Babae — {{ $selectedMunicipality }}</span>
                     </h2>
                     <div class="sec-line"></div>
+                    <div class="dance-grid-v2 attire-grid-v2">
                     @forelse($this->womenAttires as $i => $attire)
-                        @php
-                            [$ad, $al] = \App\Support\PlaceholderPalette::visitor($attire->id);
-                        @endphp
-                        <article class="attire-card attire-card-clickable" style="animation-delay:{{ $i * 90 }}ms;"
-                                 wire:click="selectAttire({{ $attire->id }})"
-                                 @keydown.enter="$wire.selectAttire({{ $attire->id }})"
-                                 @keydown.space.prevent="$wire.selectAttire({{ $attire->id }})"
-                                 wire:key="att-{{ $attire->id }}"
-                                 role="button" tabindex="0" aria-label="View {{ $attire->name_general }}">
-                            <div class="att-img">
-                                <div style="height:100%;min-height:220px;background:linear-gradient(148deg,{{ $ad }} 0%,{{ $al }} 100%);position:relative;">
-                                    <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 80 80" preserveAspectRatio="xMidYMid slice">
-                                        <defs><pattern id="apt{{ $attire->id }}" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><polygon points="10,1 19,10 10,19 1,10" fill="none" stroke="white" stroke-width="1.3" opacity="0.09"/><circle cx="10" cy="10" r="1.8" fill="white" opacity="0.063"/></pattern></defs>
-                                        <rect width="80" height="80" fill="url(#apt{{ $attire->id }})"/>
-                                    </svg>
-                                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-                                        <span style="font-family:var(--font-display);font-size:1.625rem;font-style:italic;font-weight:700;color:rgba(255,255,255,.1);text-align:center;padding:0 .75rem;">{{ $attire->name_dialect }}</span>
-                                    </div>
-                                </div>
-                                @if($attire->image_path)
-                                    <img src="{{ Storage::disk('public')->url($attire->image_path) }}"
-                                         alt="{{ $attire->name_general }}"
-                                         loading="lazy"
-                                         onerror="this.style.display='none'"
-                                         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
-                                @endif
-                            </div>
-                            <div class="att-body">
-                                <h3 class="att-title">{{ $attire->name_general }}</h3>
-                                <p class="att-dialect">{{ $attire->name_dialect }}</p>
-                                <p class="att-desc">{{ $attire->description }}</p>
-                                @if($attire->source_info)
-                                    <p class="att-src"><em>
-                                        <span x-show="!$store.app || $store.app.lang === 'en'">Source:</span>
-                                        <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Pinagkukunan:</span>
-                                    </em> {{ $attire->source_info }}</p>
-                                @endif
-                                <span class="att-cta">View details →</span>
-                            </div>
-                        </article>
+                        <x-visitor.attire-card-v2 :attire="$attire" :delay="$i * 70" />
                     @empty
-                        <div class="vis-empty-state">
+                        <div class="vis-empty-state" style="grid-column:1/-1;">
                             <span x-show="!$store.app || $store.app.lang === 'en'">No women's attires documented for this municipality yet.</span>
                             <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Wala pang naitalang kasuotan ng babae para sa munisipalidad na ito.</span>
                         </div>
                     @endforelse
+                </div>
                 </section>
 
                 {{-- Men's Attire Section --}}
@@ -224,57 +178,22 @@
                         <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Kasuotan ng Lalaki — {{ $selectedMunicipality }}</span>
                     </h2>
                     <div class="sec-line"></div>
+                    <div class="dance-grid-v2 attire-grid-v2">
                     @forelse($this->menAttires as $i => $attire)
-                        @php
-                            [$ad, $al] = \App\Support\PlaceholderPalette::visitor($attire->id);
-                        @endphp
-                        <article class="attire-card attire-card-clickable" style="animation-delay:{{ $i * 90 }}ms;"
-                                 wire:click="selectAttire({{ $attire->id }})"
-                                 @keydown.enter="$wire.selectAttire({{ $attire->id }})"
-                                 @keydown.space.prevent="$wire.selectAttire({{ $attire->id }})"
-                                 wire:key="att-{{ $attire->id }}"
-                                 role="button" tabindex="0" aria-label="View {{ $attire->name_general }}">
-                            <div class="att-img">
-                                <div style="height:100%;min-height:220px;background:linear-gradient(148deg,{{ $ad }} 0%,{{ $al }} 100%);position:relative;">
-                                    <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 80 80" preserveAspectRatio="xMidYMid slice">
-                                        <defs><pattern id="apm{{ $attire->id }}" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><polygon points="10,1 19,10 10,19 1,10" fill="none" stroke="white" stroke-width="1.3" opacity="0.09"/><circle cx="10" cy="10" r="1.8" fill="white" opacity="0.063"/></pattern></defs>
-                                        <rect width="80" height="80" fill="url(#apm{{ $attire->id }})"/>
-                                    </svg>
-                                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-                                        <span style="font-family:var(--font-display);font-size:1.625rem;font-style:italic;font-weight:700;color:rgba(255,255,255,.1);text-align:center;padding:0 .75rem;">{{ $attire->name_dialect }}</span>
-                                    </div>
-                                </div>
-                                @if($attire->image_path)
-                                    <img src="{{ Storage::disk('public')->url($attire->image_path) }}"
-                                         alt="{{ $attire->name_general }}"
-                                         loading="lazy"
-                                         onerror="this.style.display='none'"
-                                         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
-                                @endif
-                            </div>
-                            <div class="att-body">
-                                <h3 class="att-title">{{ $attire->name_general }}</h3>
-                                <p class="att-dialect">{{ $attire->name_dialect }}</p>
-                                <p class="att-desc">{{ $attire->description }}</p>
-                                @if($attire->source_info)
-                                    <p class="att-src"><em>
-                                        <span x-show="!$store.app || $store.app.lang === 'en'">Source:</span>
-                                        <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Pinagkukunan:</span>
-                                    </em> {{ $attire->source_info }}</p>
-                                @endif
-                                <span class="att-cta">View details →</span>
-                            </div>
-                        </article>
+                        <x-visitor.attire-card-v2 :attire="$attire" :delay="$i * 70" />
                     @empty
-                        <div class="vis-empty-state">
+                        <div class="vis-empty-state" style="grid-column:1/-1;">
                             <span x-show="!$store.app || $store.app.lang === 'en'">No men's attires documented for this municipality yet.</span>
                             <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Wala pang naitalang kasuotan ng lalaki para sa munisipalidad na ito.</span>
                         </div>
                     @endforelse
+                </div>
                 </section>
 
                 </div>
             </div>
+
+            <x-visitor.photo-lightbox />
         </div>
     @endif
 
@@ -289,39 +208,23 @@
     @endphp
     <div class="vis-modal-ov" wire:click.self="closeAttireModal()"
          x-data="{
-            photoExpanded: false,
+            previewUrl: null,
             init() { document.documentElement.classList.add('modal-open'); },
             destroy() { document.documentElement.classList.remove('modal-open'); },
-            openPhoto() { this.photoExpanded = true; },
-            closePhoto() { this.photoExpanded = false; }
+            openPhoto() { this.previewUrl = @json($attireImgUrl); },
+            closePreview() { this.previewUrl = null; }
          }"
-         @keydown.escape.window="photoExpanded && (closePhoto(), $event.stopPropagation())">
+         @keydown.escape.window="previewUrl ? closePreview() : null">
         <div class="dmodal" wire:key="amodal-{{ $attire->id }}">
-            <button class="vis-close-btn" wire:click="closeAttireModal()" aria-label="Close">✕</button>
-
-            {{-- HERO --}}
-            <header class="dmodal-hero">
-                <div class="dmodal-hero-bg" style="background:linear-gradient(148deg,{{ $amd }} 0%,{{ $aml }} 100%);">
-                    <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 80 80" preserveAspectRatio="xMidYMid slice">
-                        <defs><pattern id="amp{{ $attire->id }}" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><polygon points="10,1 19,10 10,19 1,10" fill="none" stroke="white" stroke-width="1.3" opacity="0.09"/><circle cx="10" cy="10" r="1.8" fill="white" opacity="0.063"/></pattern></defs>
-                        <rect width="80" height="80" fill="url(#amp{{ $attire->id }})"/>
-                    </svg>
-                </div>
-                @if($attireImgUrl)
-                    <img src="{{ $attireImgUrl }}"
-                         alt="{{ $attire->name_general }}" onerror="this.style.display='none'" class="dmodal-hero-img" />
-                    <button type="button" class="dmodal-expand-btn" @click.stop="openPhoto()"
-                            aria-label="View full photo">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"/>
-                        </svg>
-                        <span class="dmodal-expand-label">
-                            <span x-show="!$store.app || $store.app.lang === 'en'">Full photo</span>
-                            <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Buong larawan</span>
-                        </span>
-                    </button>
-                @endif
-                <div class="dmodal-hero-shade"></div>
+            <x-visitor.modal-hero
+                :image-url="$attireImgUrl"
+                :image-alt="$attire->name_general"
+                :gradient-from="$amd"
+                :gradient-to="$aml"
+                :pattern-id="'amp'.$attire->id">
+                <x-slot:actions>
+                    <button type="button" class="vis-close-btn" wire:click="closeAttireModal()" aria-label="Close">✕</button>
+                </x-slot:actions>
                 <div class="dmodal-hero-text">
                     <span class="vis-badge {{ $genderKey }}">{{ ucfirst($attire->gender) }}'s Attire</span>
                     <h2 class="dmodal-title">{{ $attire->name_general }}</h2>
@@ -329,7 +232,7 @@
                         <p class="dmodal-tagline">{{ $aTagline }}</p>
                     @endif
                 </div>
-            </header>
+            </x-visitor.modal-hero>
 
             <div class="dmodal-scroll">
                 {{-- DETAILS --}}
@@ -389,25 +292,7 @@
             </div>
         </div>
 
-        {{-- Full-size photo lightbox --}}
-        @if($attireImgUrl)
-        <div class="photo-lightbox"
-             x-show="photoExpanded"
-             x-cloak
-             x-transition:enter="transition ease-out duration-200"
-             x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-100"
-             x-transition:leave="transition ease-in duration-150"
-             x-transition:leave-start="opacity-100"
-             x-transition:leave-end="opacity-0"
-             @click.self="closePhoto()"
-             role="dialog"
-             aria-modal="true"
-             aria-label="Full size photo">
-            <button type="button" class="photo-lightbox-close" @click="closePhoto()" aria-label="Close">✕</button>
-            <img src="{{ $attireImgUrl }}" alt="{{ $attire->name_general }}" class="photo-lightbox-img" />
-        </div>
-        @endif
+        <x-visitor.photo-lightbox />
     </div>
     @endif
 </div>

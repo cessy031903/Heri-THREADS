@@ -1461,26 +1461,35 @@ body.heri-surface .mob-nav {
 .dmodal-hero { position:relative; flex-shrink:0; height:clamp(220px, 34vh, 320px); overflow:hidden; }
 .dmodal-hero-bg  { position:absolute; inset:0; }
 .dmodal-hero-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1; }
-.dmodal-hero-shade { position:absolute; inset:0; z-index:2; background:linear-gradient(to top, rgba(10,7,4,.92) 4%, rgba(10,7,4,.35) 45%, transparent 78%); }
-.dmodal-hero-text { position:absolute; z-index:3; left:0; right:0; bottom:0; padding:clamp(1.25rem,3vw,2.25rem); }
-.dmodal-expand-btn {
-  position:absolute; z-index:4; right:1rem; top:50%; transform:translateY(-50%);
-  display:flex; flex-direction:column; align-items:center; gap:.35rem;
-  padding:.55rem .5rem; border-radius:.75rem; cursor:pointer;
-  background:rgba(10,7,4,.55); border:1.5px solid rgba(212,165,116,.45);
-  color:var(--gold-light); backdrop-filter:blur(6px);
-  transition:background 150ms, border-color 150ms, transform 150ms;
+.dmodal-hero-shade { position:absolute; inset:0; z-index:2; background:linear-gradient(to top, rgba(10,7,4,.92) 4%, rgba(10,7,4,.35) 45%, transparent 78%); pointer-events:none; }
+.dmodal-hero-text { position:absolute; z-index:3; left:0; right:0; bottom:0; padding:clamp(1.25rem,3vw,2.25rem); pointer-events:none; }
+.dmodal-hero-actions {
+  position:absolute; top:.875rem; right:.875rem; z-index:10;
+  display:flex; align-items:center; gap:.5rem;
+  padding:.3rem; border-radius:999px;
+  background:rgba(10,7,4,.42); backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.12);
+  pointer-events:none;
 }
-.dmodal-expand-btn:hover,
-.dmodal-expand-btn:focus-visible {
-  background:rgba(10,7,4,.78); border-color:var(--gold);
-  transform:translateY(-50%) scale(1.04);
+.dmodal-hero-actions > * { pointer-events:auto; flex-shrink:0; }
+.dmodal-hero-actions .image-zoom-btn,
+.dmodal-hero-actions .vis-close-btn { position:static; top:auto; right:auto; left:auto; }
+.image-zoom-btn {
+  position:absolute; z-index:6;
+  display:inline-flex; align-items:center; justify-content:center;
+  width:44px; height:44px; border-radius:50%; cursor:zoom-in;
+  background:rgba(253,252,248,.97); border:2px solid color-mix(in srgb, var(--org-timber), transparent 20%);
+  color:var(--char); box-shadow:0 4px 18px rgba(0,0,0,.35);
+  transition:background 150ms, transform 150ms, box-shadow 150ms;
+  pointer-events:auto;
 }
-.dmodal-expand-label {
-  font-family:var(--font-body); font-size:.58rem; font-weight:700;
-  letter-spacing:.06em; text-transform:uppercase; line-height:1.1;
-  max-width:3.5rem; text-align:center;
+.image-zoom-btn svg { flex-shrink:0; }
+.image-zoom-btn:hover,
+.image-zoom-btn:focus-visible {
+  background:var(--white); transform:scale(1.06);
+  box-shadow:0 6px 22px rgba(0,0,0,.4);
 }
+.dance-card-v2 .image-zoom-btn { top:14px; right:14px; z-index:6; }
 .photo-lightbox {
   position:fixed; inset:0; z-index:calc(var(--z-modal) + 10);
   display:flex; align-items:center; justify-content:center;
@@ -1547,48 +1556,15 @@ body.heri-surface .mob-nav {
 .rel-name { font-family:var(--font-body); font-size:.82rem; font-weight:600; color:var(--org-foreground); line-height:1.3; }
 .vis-modal-vid-label { font-family:var(--font-body); font-size:.7rem; font-weight:700; color:var(--org-moss); letter-spacing:.12em; text-transform:uppercase; margin-bottom:.75rem; }
 .vis-close-btn {
-  position:absolute; top:.875rem; right:.875rem;
   width:44px; height:44px; border-radius:50%;
   background:rgba(253,252,248,.94); border:2px solid color-mix(in srgb, var(--org-timber), transparent 30%);
   cursor:pointer; display:flex; align-items:center; justify-content:center;
   font-size:.9rem; color:var(--org-moss); transition:background 220ms, transform 220ms, box-shadow 220ms;
-  z-index:10; box-shadow:var(--org-shadow-moss);
+  box-shadow:var(--org-shadow-moss);
 }
 .vis-close-btn:hover { background:var(--org-moss-soft); transform:scale(1.06); box-shadow:var(--org-shadow-clay); }
 .vid-wrap { border-radius:.75rem; overflow:hidden; aspect-ratio:16/9; background:#111; }
 .vid-wrap iframe { width:100%; height:100%; border:none; display:block; }
-
-/* ── MUNICIPALITY CARDS V2 ───────────────────────────────────── */
-.mun-grid-v2 {
-  display:grid; grid-template-columns:repeat(3,1fr); gap:1.125rem;
-  padding:0 2rem 4rem; max-width:1200px; margin:0 auto;
-}
-@media(max-width:1024px){ .mun-grid-v2 { grid-template-columns:repeat(2,1fr); } }
-@media(max-width:600px)  { .mun-grid-v2 { grid-template-columns:1fr; padding:0 1rem 3.5rem; } }
-
-.mun-card-v2 {
-  border-radius:26px 18px 22px 24px / 20px 26px 20px 22px; overflow:hidden; cursor:pointer; aspect-ratio:4/3;
-  position:relative; border:1px solid rgba(212,165,116,.1);
-  animation:cellIn .5s cubic-bezier(.22,1,.36,1) both;
-  transition:transform 420ms var(--org-ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
-    box-shadow 420ms var(--org-ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
-    border-color 420ms var(--org-ease-out, cubic-bezier(0.22, 1, 0.36, 1));
-}
-.mun-card-v2:hover {
-  transform:translateY(-6px) rotate(0.45deg);
-  box-shadow:
-    0 24px 64px rgba(0,0,0,.48),
-    0 10px 32px -8px rgba(193, 140, 93, 0.14);
-  border-color:rgba(212,165,116,.3);
-}
-.mun2-content {
-  position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end; padding:1.75rem;
-  background:linear-gradient(to top, rgba(10,7,4,.92) 0%, transparent 60%);
-}
-.mun2-name { font-family:var(--font-display); font-size:clamp(1.5rem,2.8vw,2.125rem); font-weight:700; color:rgba(255,255,255,.92); line-height:1.1; margin-bottom:.25rem; }
-.mun2-tag  { font-family:var(--font-body); font-style:italic; font-size:.8125rem; color:rgba(255,255,255,.38); margin-bottom:.875rem; opacity:0; transform:translateY(7px); transition:opacity 240ms 40ms, transform 240ms 40ms; }
-.mun2-cta  { font-family:var(--font-body); font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); display:flex; align-items:center; gap:.35rem; opacity:0; transition:opacity 200ms 80ms; }
-.mun-card-v2:hover .mun2-tag, .mun-card-v2:hover .mun2-cta { opacity:1; transform:none; }
 
 /* ── ATTIRE DETAIL PAGE ──────────────────────────────────────── */
 .attires-wrap { max-width:1100px; margin:0 auto; padding:2rem 2rem 5rem; }
@@ -1762,6 +1738,14 @@ body.heri-surface .mob-nav {
 }
 .attires-wrap-profile {
   padding-top: 0.5rem;
+}
+.attire-grid-v2 {
+  padding: 0 0 0.5rem;
+  max-width: none;
+  margin: 0;
+}
+@media(max-width:600px) {
+  .attire-grid-v2 { padding: 0 0 0.5rem; }
 }
 
 /* ── INTERACTIVE GUIDE / PAIRED HOTSPOTS ─────────────────────── */

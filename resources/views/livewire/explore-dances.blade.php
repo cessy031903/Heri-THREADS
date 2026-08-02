@@ -1,6 +1,12 @@
 <div>
     {{-- ── PAGE HEADER ────────────────────────────────────────── --}}
-    <div class="vis-page-dark">
+    <div class="vis-page-dark"
+         x-data="{
+            previewUrl: null,
+            openPreview(url) { this.previewUrl = url; },
+            closePreview() { this.previewUrl = null; }
+         }"
+         @keydown.escape.window="previewUrl && closePreview()">
         <div class="vis-page-hd">
             <p class="vis-eyebrow">Ifugao Cultural Archive</p>
             <h1 class="vis-page-title">
@@ -76,10 +82,12 @@
                     </div>
                     {{-- Image overlay if exists --}}
                     @if($dance->image_path)
-                        <img src="{{ Storage::disk('public')->url($dance->image_path) }}"
+                        @php $danceImgUrl = Storage::disk('public')->url($dance->image_path); @endphp
+                        <img src="{{ $danceImgUrl }}"
                              alt="{{ $dance->name }}"
                              onerror="this.style.display='none'"
                              style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
+                        <x-visitor.image-zoom-btn click="openPreview('{{ $danceImgUrl }}')" />
                     @endif
                     {{-- Vignette --}}
                     <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(10,7,4,.6) 0%, transparent 55%);"></div>
@@ -123,6 +131,8 @@
                 {{ $this->dances->links() }}
             </div>
         @endif
+
+        <x-visitor.photo-lightbox />
     </div>
 
     {{-- ── DANCE DETAIL MODAL (immersive) ──────────────────────── --}}
@@ -133,27 +143,27 @@
         $mCatColors = ['vb-pagaddut', 'vb-hinggatut', 'vb-dinuya'];
         $mCatKey = $mCatColors[abs(crc32((string) $dance->category)) % count($mCatColors)];
         $tagline = collect([$dance->region, $dance->origin])->filter()->implode(' · ');
+        $danceImgUrl = $dance->image_path ? Storage::disk('public')->url($dance->image_path) : null;
     @endphp
     <div class="vis-modal-ov" wire:click.self="closeModal()"
-         x-data="{ init() { document.documentElement.classList.add('modal-open'); }, destroy() { document.documentElement.classList.remove('modal-open'); } }">
+         x-data="{
+            previewUrl: null,
+            init() { document.documentElement.classList.add('modal-open'); },
+            destroy() { document.documentElement.classList.remove('modal-open'); },
+            openPhoto() { this.previewUrl = @json($danceImgUrl); },
+            closePreview() { this.previewUrl = null; }
+         }"
+         @keydown.escape.window="previewUrl ? closePreview() : null">
         <div class="dmodal" wire:key="dmodal-{{ $dance->id }}">
-            <button class="vis-close-btn" wire:click="closeModal()" aria-label="Close">✕</button>
-
-            {{-- SECTION 1 — HERO --}}
-            <header class="dmodal-hero">
-                <div class="dmodal-hero-bg" style="background:linear-gradient(148deg,{{ $md }} 0%,{{ $ml }} 100%);">
-                    <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 80 80" preserveAspectRatio="xMidYMid slice">
-                        <defs><pattern id="ptm{{ $dance->id }}" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><polygon points="10,1 19,10 10,19 1,10" fill="none" stroke="white" stroke-width="1.3" opacity="0.09"/><circle cx="10" cy="10" r="1.8" fill="white" opacity="0.063"/></pattern></defs>
-                        <rect width="80" height="80" fill="url(#ptm{{ $dance->id }})"/>
-                    </svg>
-                </div>
-                @if($dance->image_path)
-                    <img src="{{ Storage::disk('public')->url($dance->image_path) }}"
-                         alt="{{ $dance->name }}"
-                         onerror="this.style.display='none'"
-                         class="dmodal-hero-img" />
-                @endif
-                <div class="dmodal-hero-shade"></div>
+            <x-visitor.modal-hero
+                :image-url="$danceImgUrl"
+                :image-alt="$dance->name"
+                :gradient-from="$md"
+                :gradient-to="$ml"
+                :pattern-id="'ptm'.$dance->id">
+                <x-slot:actions>
+                    <button type="button" class="vis-close-btn" wire:click="closeModal()" aria-label="Close">✕</button>
+                </x-slot:actions>
                 <div class="dmodal-hero-text">
                     <span class="vis-badge {{ $mCatKey }}">{{ $dance->municipality ?? $dance->category }}</span>
                     <h2 class="dmodal-title">{{ $dance->name }}</h2>
@@ -161,7 +171,7 @@
                         <p class="dmodal-tagline">{{ $tagline }}</p>
                     @endif
                 </div>
-            </header>
+            </x-visitor.modal-hero>
 
             {{-- SCROLLABLE BODY --}}
             <div class="dmodal-scroll">
@@ -257,6 +267,8 @@
                 @endif
             </div>
         </div>
+
+        <x-visitor.photo-lightbox />
     </div>
     @endif
 </div>
