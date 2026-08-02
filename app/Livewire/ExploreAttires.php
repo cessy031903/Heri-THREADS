@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Enums\Municipality;
 use App\Models\Attire;
 use App\Models\InteractiveGuide;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -22,6 +23,16 @@ class ExploreAttires extends Component
     public function municipalities(): array
     {
         return Municipality::labels();
+    }
+
+    /** @return array<string, string> Municipality name => card image URL, for those that have one. */
+    #[Computed]
+    public function municipalityCardImages(): array
+    {
+        return InteractiveGuide::whereNotNull('card_image_path')
+            ->pluck('card_image_path', 'municipality')
+            ->map(fn ($path) => Storage::disk('public')->url($path))
+            ->all();
     }
 
     #[Computed]

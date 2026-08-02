@@ -20,6 +20,7 @@
                         [$md, $ml] = \App\Support\PlaceholderPalette::municipality($i);
                         $taglines = ['Alfonso Lista' => 'Gateway to Ifugao', 'Aguinaldo' => 'Where Traditions Breathe', 'Asipulo' => 'Land of the Mountain Springs', 'Banaue' => 'Home of the Eighth Wonder', 'Hingyon' => 'Village of the Weavers', 'Hungduan' => 'Heart of Highland Tradition', 'Kiangan' => 'Cradle of Ifugao Civilization', 'Lagawe' => 'Provincial Capital of Ifugao', 'Lamut' => 'Valley of Ancient Rites', 'Mayoyao' => 'Where Eagles Soar', 'Tinoc' => 'Land of the Tinoc Weavers'];
                         $tagline = $taglines[$muni] ?? 'Cultural Heritage Site';
+                        $cardImage = $this->municipalityCardImages[$muni] ?? null;
                     @endphp
                     <article class="mun-card-v2 anim-fade-up"
                              style="animation-delay:{{ $i * 80 }}ms;"
@@ -34,6 +35,12 @@
                                 <rect width="80" height="80" fill="url(#mpt{{ $i }})"/>
                             </svg>
                         </div>
+                        @if($cardImage)
+                            <img src="{{ $cardImage }}" alt="" aria-hidden="true"
+                                 style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"
+                                 loading="lazy" onerror="this.style.display='none'">
+                            <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(8,5,3,.75) 0%, rgba(8,5,3,.2) 55%, rgba(8,5,3,.35) 100%);"></div>
+                        @endif
                         <div class="mun2-content">
                             <h2 class="mun2-name">{{ $muni }}</h2>
                             <p class="mun2-tag">{{ $tagline }}</p>

@@ -15,6 +15,7 @@ class InteractiveGuide extends Model
         'title',
         'instruction',
         'image_path',
+        'card_image_path',
     ];
 
     public function hotspots(): HasMany

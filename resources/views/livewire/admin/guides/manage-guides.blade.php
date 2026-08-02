@@ -126,6 +126,39 @@
                         @error('image') <p class="form-error">{{ $message }}</p> @enderror
                     </div>
 
+                    <div class="form-group">
+                        <label class="form-label">{{ $isEditing && $existingCardImagePath ? 'Replace Selection Card Image (optional)' : 'Selection Card Image (optional)' }}</label>
+                        <p style="font-size:.72rem;color:var(--gray-lt);margin:-.25rem 0 .5rem;">
+                            Shown on the Explore Attires municipality picker grid. Falls back to a themed gradient if left blank.
+                        </p>
+                        @if($cardImage && $cardImage->isPreviewable())
+                            <div style="position:relative;margin-bottom:.5rem;width:160px;">
+                                <img src="{{ $cardImage->temporaryUrl() }}"
+                                     style="width:160px;height:90px;object-fit:cover;border-radius:.5rem;" />
+                                <button type="button" wire:click="$set('cardImage', null)"
+                                        style="position:absolute;top:.25rem;right:.25rem;width:1.5rem;height:1.5rem;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;border:none;cursor:pointer;font-size:.8rem;line-height:1;"
+                                        title="Remove selected image" aria-label="Remove selected image">✕</button>
+                            </div>
+                        @elseif($cardImage)
+                            {{-- Selected but not previewable — no preview, validation error shows below. --}}
+                        @elseif($existingCardImagePath)
+                            <img src="{{ Storage::disk('public')->url($existingCardImagePath) }}"
+                                 style="width:160px;height:90px;object-fit:cover;border-radius:.5rem;margin-bottom:.5rem;" />
+                        @endif
+                        <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:90px;border:2px dashed {{ $errors->has('cardImage') ? 'var(--red)' : 'var(--tan)' }};border-radius:.5rem;cursor:pointer;background:var(--cream);">
+                            <span style="font-size:.78rem;color:var(--gray);">
+                                @if($cardImage)
+                                    <span style="color:var(--gold);font-weight:600;">{{ $cardImage->getClientOriginalName() }}</span>
+                                @else
+                                    Click to upload · JPG or PNG, max 10 MB
+                                @endif
+                            </span>
+                            <input wire:model="cardImage" type="file" accept="image/jpeg,image/png,image/jpg" style="display:none;" />
+                        </label>
+                        <div wire:loading wire:target="cardImage" style="font-size:.75rem;color:var(--gray);margin-top:.25rem;">Uploading image…</div>
+                        @error('cardImage') <p class="form-error">{{ $message }}</p> @enderror
+                    </div>
+
                     {{-- ── Hotspots editor ── --}}
                     @php
                         $previewUrl = null;

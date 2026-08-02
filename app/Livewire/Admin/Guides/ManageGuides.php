@@ -28,6 +28,8 @@ class ManageGuides extends Component
     public string $instruction  = '';
     public $image;
     public ?string $existingImagePath = null;
+    public $cardImage;
+    public ?string $existingCardImagePath = null;
 
     // Nested hotspots (array of rows)
     public array $hotspots = [];
@@ -50,6 +52,7 @@ class ManageGuides extends Component
             'title'              => 'required|string|max:255',
             'instruction'        => 'nullable|string|max:255',
             'image'              => $this->isEditing ? 'nullable|image|mimes:jpeg,png,jpg|max:10240' : 'nullable|image|mimes:jpeg,png,jpg|max:10240',
+            'cardImage'          => 'nullable|image|mimes:jpeg,png,jpg|max:10240',
             'hotspots'             => 'array',
             'hotspots.*.label'     => 'required|string|max:255',
             'hotspots.*.description' => 'nullable|string|max:1000',
@@ -104,6 +107,7 @@ class ManageGuides extends Component
         $this->title             = $guide->title;
         $this->instruction       = (string) $guide->instruction;
         $this->existingImagePath = $guide->image_path;
+        $this->existingCardImagePath = $guide->card_image_path;
         $this->hotspots = $guide->hotspots->map(fn ($h) => [
             'id'          => $h->id,
             'label'       => $h->label,
@@ -175,13 +179,22 @@ class ManageGuides extends Component
             $imagePath = $this->image->store('guides', 'public');
         }
 
+        $cardImagePath = $this->existingCardImagePath;
+        if ($this->cardImage) {
+            if ($this->existingCardImagePath) {
+                Storage::disk('public')->delete($this->existingCardImagePath);
+            }
+            $cardImagePath = $this->cardImage->store('guides', 'public');
+        }
+
         $guide = InteractiveGuide::updateOrCreate(
             ['id' => $this->editingId],
             [
-                'municipality' => $this->municipality,
-                'title'        => $this->title,
-                'instruction'  => $this->instruction ?: null,
-                'image_path'   => $imagePath,
+                'municipality'    => $this->municipality,
+                'title'           => $this->title,
+                'instruction'     => $this->instruction ?: null,
+                'image_path'      => $imagePath,
+                'card_image_path' => $cardImagePath,
             ]
         );
 
@@ -219,6 +232,9 @@ class ManageGuides extends Component
         if ($guide->image_path) {
             Storage::disk('public')->delete($guide->image_path);
         }
+        if ($guide->card_image_path) {
+            Storage::disk('public')->delete($guide->card_image_path);
+        }
         AuditLog::record('delete', 'guide', $guide->id, $guide->title);
         $guide->delete();
         $this->dispatch('toast', message: "Guide \"{$guide->title}\" deleted.", type: 'success');
@@ -228,7 +244,7 @@ class ManageGuides extends Component
 
     private function resetForm(): void
     {
-        $this->reset(['municipality', 'title', 'instruction', 'image', 'existingImagePath', 'editingId', 'hotspots']);
+        $this->reset(['municipality', 'title', 'instruction', 'image', 'existingImagePath', 'cardImage', 'existingCardImagePath', 'editingId', 'hotspots']);
         $this->hotspots = [];
         $this->resetValidation();
     }

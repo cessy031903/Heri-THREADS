@@ -213,7 +213,7 @@
                     </div>
 
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="form-group" x-data="{ videoPct: 0 }">
                             <label class="form-label">Upload Video <span style="font-weight:400;color:var(--gray-lt);">(optional — MP4/MOV/WebM, max 50 MB)</span></label>
                             @if($video && $video->isPreviewable())
                                 <div style="position:relative;margin-bottom:.5rem;">
@@ -252,9 +252,22 @@
                                         Click to upload · MP4, MOV, or WebM, max 50 MB
                                     @endif
                                 </span>
-                                <input wire:model="video" type="file" accept="video/mp4,video/quicktime,video/webm" style="display:none;" />
+                                <input wire:model="video" type="file" accept="video/mp4,video/quicktime,video/webm" style="display:none;"
+                                       x-on:livewire-upload-start="videoPct = 0"
+                                       x-on:livewire-upload-progress="videoPct = $event.detail.progress"
+                                       x-on:livewire-upload-finish="videoPct = 100"
+                                       x-on:livewire-upload-cancel="videoPct = 0" />
                             </label>
-                            <div wire:loading wire:target="video" style="font-size:.75rem;color:var(--gray);margin-top:.25rem;">Uploading video…</div>
+                            <div wire:loading wire:target="video" style="margin-top:.375rem;">
+                                <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--gray);margin-bottom:.25rem;">
+                                    <span>Uploading video…</span>
+                                    <span x-text="videoPct + '%'"></span>
+                                </div>
+                                <div style="height:6px;border-radius:3px;background:var(--tan);overflow:hidden;">
+                                    <div style="height:100%;background:var(--gold);transition:width 200ms ease;"
+                                         :style="'width:' + videoPct + '%'"></div>
+                                </div>
+                            </div>
                             @error('video') <p class="form-error">{{ $message }}</p> @enderror
                         </div>
 
