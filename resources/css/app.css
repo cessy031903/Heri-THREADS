@@ -1463,6 +1463,44 @@ body.heri-surface .mob-nav {
 .dmodal-hero-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1; }
 .dmodal-hero-shade { position:absolute; inset:0; z-index:2; background:linear-gradient(to top, rgba(10,7,4,.92) 4%, rgba(10,7,4,.35) 45%, transparent 78%); }
 .dmodal-hero-text { position:absolute; z-index:3; left:0; right:0; bottom:0; padding:clamp(1.25rem,3vw,2.25rem); }
+.dmodal-expand-btn {
+  position:absolute; z-index:4; right:1rem; top:50%; transform:translateY(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:.35rem;
+  padding:.55rem .5rem; border-radius:.75rem; cursor:pointer;
+  background:rgba(10,7,4,.55); border:1.5px solid rgba(212,165,116,.45);
+  color:var(--gold-light); backdrop-filter:blur(6px);
+  transition:background 150ms, border-color 150ms, transform 150ms;
+}
+.dmodal-expand-btn:hover,
+.dmodal-expand-btn:focus-visible {
+  background:rgba(10,7,4,.78); border-color:var(--gold);
+  transform:translateY(-50%) scale(1.04);
+}
+.dmodal-expand-label {
+  font-family:var(--font-body); font-size:.58rem; font-weight:700;
+  letter-spacing:.06em; text-transform:uppercase; line-height:1.1;
+  max-width:3.5rem; text-align:center;
+}
+.photo-lightbox {
+  position:fixed; inset:0; z-index:calc(var(--z-modal) + 10);
+  display:flex; align-items:center; justify-content:center;
+  padding:max(1rem, env(safe-area-inset-top, 0px)) 1rem max(1rem, env(safe-area-inset-bottom, 0px));
+  background:rgba(8,5,3,.92); backdrop-filter:blur(10px);
+}
+.photo-lightbox-img {
+  max-width:min(96vw, 1200px); max-height:min(92vh, 900px);
+  width:auto; height:auto; object-fit:contain;
+  border-radius:.75rem; box-shadow:0 24px 80px rgba(0,0,0,.55);
+}
+.photo-lightbox-close {
+  position:absolute; top:max(1rem, env(safe-area-inset-top, 0px)); right:1rem;
+  width:44px; height:44px; border-radius:50%; cursor:pointer;
+  background:rgba(253,252,248,.94); border:2px solid color-mix(in srgb, var(--org-timber), transparent 30%);
+  color:var(--char); font-size:1.1rem; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+  transition:background 150ms, transform 150ms;
+}
+.photo-lightbox-close:hover { background:var(--org-moss-soft); transform:scale(1.06); }
 .dmodal-title { font-family:var(--font-display); font-size:clamp(1.85rem,4vw,2.85rem); font-weight:700; color:#fff; line-height:1.08; margin:.6rem 0 0; letter-spacing:-.01em; }
 .dmodal-tagline { font-family:var(--font-body); font-style:italic; font-size:.95rem; color:rgba(255,255,255,.7); margin-top:.4rem; }
 /* Scroll body */
@@ -1751,13 +1789,21 @@ body.heri-surface .mob-nav {
 .guide-stage {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
   background: linear-gradient(135deg, #2d5016 0%, #1a3a10 100%);
   border: 1px solid rgba(212,165,116,.16);
   box-shadow: 0 24px 64px rgba(0,0,0,.4);
 }
-.guide-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-.guide-fallback { position:absolute; inset:0; }
+.guide-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  vertical-align: top;
+}
+.guide-fallback {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
 .guide-fallback svg { width:100%; height:100%; display:block; }
 .hs-dot {
   position:absolute; transform:translate(-50%,-50%);
@@ -1797,7 +1843,6 @@ body.heri-surface .mob-nav {
 .hs-legend-item { display:flex; align-items:center; gap:.4rem; font-size:.75rem; color:rgba(255,255,255,.5); font-family:var(--font-body); }
 .hs-legend-dot { width:18px; height:18px; border-radius:50%; background:var(--gold); color:white; display:flex; align-items:center; justify-content:center; font-size:.6rem; font-weight:800; flex-shrink:0; }
 @media(max-width:600px) {
-  .guide-stage { aspect-ratio: 4 / 3; }
   .hs-inner { width:24px; height:24px; font-size:.62rem; }
   .hs-ring { width:30px; height:30px; }
   .hs-tooltip { width:170px; font-size:.72rem; }

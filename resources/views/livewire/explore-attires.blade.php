@@ -285,9 +285,17 @@
         [$amd, $aml] = \App\Support\PlaceholderPalette::visitor($attire->id);
         $genderKey = $attire->gender === 'women' ? 'bf' : 'bm';
         $aTagline = collect([$attire->name_dialect, $attire->municipality])->filter()->implode(' · ');
+        $attireImgUrl = $attire->image_path ? Storage::disk('public')->url($attire->image_path) : null;
     @endphp
     <div class="vis-modal-ov" wire:click.self="closeAttireModal()"
-         x-data="{ init() { document.documentElement.classList.add('modal-open'); }, destroy() { document.documentElement.classList.remove('modal-open'); } }">
+         x-data="{
+            photoExpanded: false,
+            init() { document.documentElement.classList.add('modal-open'); },
+            destroy() { document.documentElement.classList.remove('modal-open'); },
+            openPhoto() { this.photoExpanded = true; },
+            closePhoto() { this.photoExpanded = false; }
+         }"
+         @keydown.escape.window="photoExpanded && (closePhoto(), $event.stopPropagation())">
         <div class="dmodal" wire:key="amodal-{{ $attire->id }}">
             <button class="vis-close-btn" wire:click="closeAttireModal()" aria-label="Close">✕</button>
 
@@ -299,9 +307,19 @@
                         <rect width="80" height="80" fill="url(#amp{{ $attire->id }})"/>
                     </svg>
                 </div>
-                @if($attire->image_path)
-                    <img src="{{ Storage::disk('public')->url($attire->image_path) }}"
+                @if($attireImgUrl)
+                    <img src="{{ $attireImgUrl }}"
                          alt="{{ $attire->name_general }}" onerror="this.style.display='none'" class="dmodal-hero-img" />
+                    <button type="button" class="dmodal-expand-btn" @click.stop="openPhoto()"
+                            aria-label="View full photo">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"/>
+                        </svg>
+                        <span class="dmodal-expand-label">
+                            <span x-show="!$store.app || $store.app.lang === 'en'">Full photo</span>
+                            <span x-show="$store.app && $store.app.lang === 'fil'" x-cloak>Buong larawan</span>
+                        </span>
+                    </button>
                 @endif
                 <div class="dmodal-hero-shade"></div>
                 <div class="dmodal-hero-text">
@@ -370,6 +388,26 @@
                 @endif
             </div>
         </div>
+
+        {{-- Full-size photo lightbox --}}
+        @if($attireImgUrl)
+        <div class="photo-lightbox"
+             x-show="photoExpanded"
+             x-cloak
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             @click.self="closePhoto()"
+             role="dialog"
+             aria-modal="true"
+             aria-label="Full size photo">
+            <button type="button" class="photo-lightbox-close" @click="closePhoto()" aria-label="Close">✕</button>
+            <img src="{{ $attireImgUrl }}" alt="{{ $attire->name_general }}" class="photo-lightbox-img" />
+        </div>
+        @endif
     </div>
     @endif
 </div>
