@@ -4,12 +4,12 @@ namespace App\Livewire\Admin\Guides;
 
 use App\Caching\HomepageCache;
 use App\Enums\Municipality;
+use App\Support\AdminForms\GuideFormRules;
 use App\Models\Attire;
 use App\Models\AuditLog;
 use App\Models\GuideHotspot;
 use App\Models\InteractiveGuide;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -43,31 +43,12 @@ class ManageGuides extends Component
 
     protected function rules(): array
     {
-        return [
-            'municipality' => [
-                'required',
-                'in:'.Municipality::validationList(),
-                Rule::unique('interactive_guides', 'municipality')->ignore($this->editingId),
-            ],
-            'title'              => 'required|string|max:255',
-            'instruction'        => 'nullable|string|max:255',
-            'image'              => $this->isEditing ? 'nullable|image|mimes:jpeg,png,jpg|max:10240' : 'nullable|image|mimes:jpeg,png,jpg|max:10240',
-            'cardImage'          => 'nullable|image|mimes:jpeg,png,jpg|max:10240',
-            'hotspots'             => 'array',
-            'hotspots.*.label'     => 'required|string|max:255',
-            'hotspots.*.description' => 'nullable|string|max:1000',
-            'hotspots.*.pos_x'     => 'required|numeric|min:0|max:100',
-            'hotspots.*.pos_y'     => 'required|numeric|min:0|max:100',
-            'hotspots.*.attire_id' => 'nullable|integer|exists:attires,id',
-        ];
+        return GuideFormRules::rules($this->editingId);
     }
 
     protected function messages(): array
     {
-        return [
-            'municipality.unique'   => 'This municipality already has a guide. Edit the existing one instead.',
-            'hotspots.*.label.required' => 'Each hotspot needs a label.',
-        ];
+        return GuideFormRules::messages();
     }
 
     #[Computed]
@@ -170,7 +151,7 @@ class ManageGuides extends Component
 
     public function save(): void
     {
-        $validated = $this->validate();
+        $validated = GuideFormRules::normalize($this->validate());
         $imagePath = $this->existingImagePath;
         if ($this->image) {
             if ($this->existingImagePath) {
@@ -192,7 +173,7 @@ class ManageGuides extends Component
             [
                 'municipality'    => $this->municipality,
                 'title'           => $this->title,
-                'instruction'     => $this->instruction ?: null,
+                'instruction'     => $validated['instruction'] ?? null,
                 'image_path'      => $imagePath,
                 'card_image_path' => $cardImagePath,
             ]

@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Showcase;
 
 use App\Caching\HomepageCache;
 use App\Livewire\Concerns\ManagesCrudModal;
+use App\Support\AdminForms\ShowcaseFormRules;
 use App\Models\AuditLog;
 use App\Models\ShowcasePhoto;
 use Illuminate\Support\Facades\Storage;
@@ -28,14 +29,12 @@ class ManageShowcase extends Component
 
     protected function rules(): array
     {
-        return [
-            'label'     => 'required|string|max:255',
-            'sub_label' => 'nullable|string|max:255',
-            'link_url'  => 'nullable|string|max:2048',
-            'image'     => $this->isEditing
-                ? 'nullable|image|mimes:jpeg,png,jpg|max:10240'
-                : 'required|image|mimes:jpeg,png,jpg|max:10240',
-        ];
+        return ShowcaseFormRules::rules($this->isEditing);
+    }
+
+    protected function messages(): array
+    {
+        return ShowcaseFormRules::messages();
     }
 
     #[Computed]
@@ -56,11 +55,7 @@ class ManageShowcase extends Component
 
     public function save(): void
     {
-        $validated = $this->validate();
-
-        foreach (['sub_label', 'link_url'] as $optional) {
-            $validated[$optional] = filled($validated[$optional] ?? null) ? $validated[$optional] : null;
-        }
+        $validated = ShowcaseFormRules::normalize($this->validate());
 
         $imagePath = null;
         if ($this->image) {

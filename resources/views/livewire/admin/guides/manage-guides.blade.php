@@ -72,7 +72,7 @@
                 <form wire:submit="save" id="guide-form">
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Municipality *</label>
+                            <label class="form-label">Municipality</label>
                             <select wire:model="municipality" class="form-input form-select {{ $errors->has('municipality') ? 'error' : '' }}">
                                 <option value="">Select municipality</option>
                                 @foreach($this->municipalities as $m)
@@ -82,7 +82,7 @@
                             @error('municipality') <p class="form-error">{{ $message }}</p> @enderror
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Title *</label>
+                            <label class="form-label">Title</label>
                             <input wire:model="title" type="text" placeholder="e.g. Traditional Paired Dress — Interactive Guide"
                                    class="form-input {{ $errors->has('title') ? 'error' : '' }}" />
                             @error('title') <p class="form-error">{{ $message }}</p> @enderror
@@ -90,14 +90,14 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Instruction (optional)</label>
+                        <label class="form-label">Instruction</label>
                         <input wire:model="instruction" type="text" placeholder="e.g. Hover or tap each number to explore"
                                class="form-input" />
                         @error('instruction') <p class="form-error">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">{{ $isEditing && $existingImagePath ? 'Replace Image (optional)' : 'Background Image (optional)' }}</label>
+                        <label class="form-label">{{ $isEditing && $existingImagePath ? 'Replace Background Image' : 'Background Image' }}</label>
                         @if($image && $image->isPreviewable())
                             <div style="position:relative;margin-bottom:.5rem;width:160px;">
                                 <img src="{{ $image->temporaryUrl() }}"
@@ -127,7 +127,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">{{ $isEditing && $existingCardImagePath ? 'Replace Selection Card Image (optional)' : 'Selection Card Image (optional)' }}</label>
+                        <label class="form-label">{{ $isEditing && $existingCardImagePath ? 'Replace Selection Card Image' : 'Selection Card Image' }}</label>
                         <p style="font-size:.72rem;color:var(--gray-lt);margin:-.25rem 0 .5rem;">
                             Shown on the Explore Attires municipality picker grid. Falls back to a themed gradient if left blank.
                         </p>
@@ -247,12 +247,12 @@
 
                                 <div class="form-row" style="margin-bottom:.6rem;">
                                     <div class="form-group" style="margin:0;">
-                                        <label class="form-label">X % <span style="font-weight:400;color:var(--gray);">(or click the image)</span></label>
+                                        <label class="form-label">X %</label>
                                         <input wire:model="hotspots.{{ $i }}.pos_x" type="number" min="0" max="100" step="0.1" class="form-input" />
                                         @error('hotspots.'.$i.'.pos_x') <p class="form-error">{{ $message }}</p> @enderror
                                     </div>
                                     <div class="form-group" style="margin:0;">
-                                        <label class="form-label">Y % <span style="font-weight:400;color:var(--gray);">(or click the image)</span></label>
+                                        <label class="form-label">Y %</label>
                                         <input wire:model="hotspots.{{ $i }}.pos_y" type="number" min="0" max="100" step="0.1" class="form-input" />
                                         @error('hotspots.'.$i.'.pos_y') <p class="form-error">{{ $message }}</p> @enderror
                                     </div>
@@ -265,7 +265,7 @@
                                 </div>
 
                                 <div class="form-group" style="margin:0;">
-                                    <label class="form-label">Link to Attire (optional)</label>
+                                    <label class="form-label">Link to Attire</label>
                                     <select wire:model="hotspots.{{ $i }}.attire_id" class="form-input form-select">
                                         <option value="">— None —</option>
                                         @foreach($this->attireOptions as $opt)

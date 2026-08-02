@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Dances;
 use App\Caching\HomepageCache;
 use App\Enums\Municipality;
 use App\Livewire\Concerns\ManagesCrudModal;
+use App\Support\AdminForms\DanceFormRules;
 use App\Models\Dance;
 use App\Services\VideoOptimizer;
 use Illuminate\Support\Facades\Storage;
@@ -47,24 +48,12 @@ class ManageDances extends Component
 
     protected function rules(): array
     {
-        return [
-            'name'        => 'required|string|max:255',
-            'category'    => 'required|in:pagaddut,hinggatut,dinuy-a',
-            'municipality' => 'nullable|in:'.Municipality::validationList(),
-            'description' => 'required|string|max:1000',
-            'region'                => 'nullable|string|max:255',
-            'origin'                => 'nullable|string|max:255',
-            'cultural_meaning'      => 'nullable|string|max:2000',
-            'historical_background' => 'nullable|string|max:2000',
-            'video_url'   => [
-                'nullable', 'url',
-                'regex:/^https?:\/\/(www\.|m\.)?(youtube\.com\/(watch\?v=|shorts\/|embed\/)|youtu\.be\/).+/',
-            ],
-            'image'       => $this->isEditing
-                ? 'nullable|image|mimes:jpeg,png,jpg|max:10240'
-                : 'nullable|image|mimes:jpeg,png,jpg|max:10240',
-            'video'       => 'nullable|mimes:mp4,mov,webm|max:51200',
-        ];
+        return DanceFormRules::rules();
+    }
+
+    protected function messages(): array
+    {
+        return DanceFormRules::messages();
     }
 
     public array $headers = [
@@ -138,12 +127,7 @@ class ManageDances extends Component
 
     public function save(): void
     {
-        $validated = $this->validate();
-
-        // Store null (not an empty string) for optional text fields left blank.
-        foreach (['municipality', 'video_url', 'region', 'origin', 'cultural_meaning', 'historical_background'] as $optional) {
-            $validated[$optional] = filled($validated[$optional] ?? null) ? $validated[$optional] : null;
-        }
+        $validated = DanceFormRules::normalize($this->validate());
 
         $imagePath = null;
         if ($this->image) {

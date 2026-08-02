@@ -96,21 +96,21 @@
             <div class="modal-body">
                 <form wire:submit="save" id="showcase-form">
                     <div class="form-group">
-                        <label class="form-label">Label *</label>
+                        <label class="form-label">Label</label>
                         <input wire:model="label" type="text" placeholder="e.g. Alfonso Lista Attire Pair"
                                class="form-input {{ $errors->has('label') ? 'error' : '' }}" />
                         @error('label') <p class="form-error">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Sub-label <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
+                        <label class="form-label">Sub-label</label>
                         <input wire:model="sub_label" type="text" placeholder="e.g. Textiles"
                                class="form-input" />
                         @error('sub_label') <p class="form-error">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Link URL <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
+                        <label class="form-label">Link URL</label>
                         <input wire:model="link_url" type="text" placeholder="e.g. /attires?municipality=Alfonso+Lista"
                                class="form-input" />
                         @error('link_url') <p class="form-error">{{ $message }}</p> @enderror
@@ -120,9 +120,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">
-                            {{ $isEditing ? 'Replace Image (optional)' : 'Photo *' }}
-                        </label>
+                        <label class="form-label">{{ $isEditing ? 'Replace Photo' : 'Photo' }}</label>
                         @if($image && $image->isPreviewable())
                             <div style="position:relative;margin-bottom:.5rem;width:100px;">
                                 <img src="{{ $image->temporaryUrl() }}" style="width:100px;height:100px;object-fit:cover;border-radius:.5rem;" />

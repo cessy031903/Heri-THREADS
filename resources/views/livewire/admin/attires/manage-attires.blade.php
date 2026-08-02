@@ -147,13 +147,13 @@
                 <form wire:submit="save" id="attire-form">
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">General Name *</label>
+                            <label class="form-label">General Name</label>
                             <input wire:model="name_general" type="text" placeholder="e.g. Wraparound Skirt"
                                    class="form-input {{ $errors->has('name_general') ? 'error' : '' }}" />
                             @error('name_general') <p class="form-error">{{ $message }}</p> @enderror
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Dialect Name *</label>
+                            <label class="form-label">Dialect Name</label>
                             <input wire:model="name_dialect" type="text" placeholder="e.g. Tapis"
                                    class="form-input {{ $errors->has('name_dialect') ? 'error' : '' }}" />
                             @error('name_dialect') <p class="form-error">{{ $message }}</p> @enderror
@@ -184,7 +184,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Description *</label>
+                        <label class="form-label">Description</label>
                         <textarea wire:model="description" class="form-input {{ $errors->has('description') ? 'error' : '' }}"
                                   placeholder="Describe the attire, materials, cultural significance…"></textarea>
                         @error('description') <p class="form-error">{{ $message }}</p> @enderror
@@ -192,7 +192,7 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Fabric / Material <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
+                            <label class="form-label">Fabric / Material</label>
                             <input wire:model="material" type="text" placeholder="e.g. Handwoven cotton, ikat-dyed threads"
                                    class="form-input" />
                             @error('material') <p class="form-error">{{ $message }}</p> @enderror
@@ -207,16 +207,14 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Cultural Significance <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
+                        <label class="form-label">Cultural Significance</label>
                         <textarea wire:model="cultural_significance" class="form-input"
                                   placeholder="The meaning, rituals, or status this attire conveys…" style="min-height:80px;"></textarea>
                         @error('cultural_significance') <p class="form-error">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">
-                            {{ $isEditing ? 'Replace Image (optional)' : 'Attire Image *' }}
-                        </label>
+                        <label class="form-label">{{ $isEditing ? 'Replace Image' : 'Attire Image' }}</label>
                         @if($image && $image->isPreviewable())
                             <div style="position:relative;margin-bottom:.5rem;width:100px;">
                                 <img src="{{ $image->temporaryUrl() }}" style="width:100px;height:100px;object-fit:cover;border-radius:.5rem;" />

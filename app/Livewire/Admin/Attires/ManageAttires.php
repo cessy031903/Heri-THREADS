@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Attires;
 use App\Caching\HomepageCache;
 use App\Enums\Municipality;
 use App\Livewire\Concerns\ManagesCrudModal;
+use App\Support\AdminForms\AttireFormRules;
 use App\Models\Attire;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
@@ -43,19 +44,12 @@ class ManageAttires extends Component
 
     protected function rules(): array
     {
-        return [
-            'name_general' => 'required|string|max:255',
-            'name_dialect' => 'required|string|max:255',
-            'municipality' => 'required|in:'.Municipality::validationList(),
-            'gender'       => 'required|in:women,men',
-            'description'  => 'required|string|max:1500',
-            'material'              => 'nullable|string|max:255',
-            'cultural_significance' => 'nullable|string|max:2000',
-            'source_info'  => 'nullable|string|max:500',
-            'image'        => $this->isEditing
-                ? 'nullable|image|mimes:jpeg,png,jpg|max:10240'
-                : 'required|image|mimes:jpeg,png,jpg|max:10240',
-        ];
+        return AttireFormRules::rules();
+    }
+
+    protected function messages(): array
+    {
+        return AttireFormRules::messages();
     }
 
     public array $headers = [
@@ -116,11 +110,7 @@ class ManageAttires extends Component
 
     public function save(): void
     {
-        $validated = $this->validate();
-
-        foreach (['material', 'cultural_significance', 'source_info'] as $optional) {
-            $validated[$optional] = filled($validated[$optional] ?? null) ? $validated[$optional] : null;
-        }
+        $validated = AttireFormRules::normalize($this->validate());
 
         $imagePath = null;
         if ($this->image) {

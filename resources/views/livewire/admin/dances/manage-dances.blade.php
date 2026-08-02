@@ -128,7 +128,7 @@
             <div class="modal-body">
                 <form wire:submit="save" id="dance-form">
                     <div class="form-group">
-                        <label class="form-label">Native Dance *</label>
+                        <label class="form-label">Native Dance</label>
                         <input wire:model="name" type="text" placeholder="e.g. Pagaddut"
                                class="form-input {{ $errors->has('name') ? 'error' : '' }}" />
                         @error('name') <p class="form-error">{{ $message }}</p> @enderror
@@ -136,7 +136,7 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Category *</label>
+                            <label class="form-label">Category</label>
                             <select wire:model="category" class="form-input form-select">
                                 <option value="">Select a category</option>
                                 @foreach($danceTypes as $cat)
@@ -146,7 +146,7 @@
                             @error('category') <p class="form-error">{{ $message }}</p> @enderror
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Municipality <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
+                            <label class="form-label">Municipality</label>
                             <select wire:model="municipality" class="form-input form-select">
                                 <option value="">Select a municipality</option>
                                 @foreach($this->municipalityOptions as $m)
@@ -158,7 +158,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Description *</label>
+                        <label class="form-label">Description</label>
                         <textarea wire:model="description" class="form-input {{ $errors->has('description') ? 'error' : '' }}"
                                   placeholder="Describe the dance, its cultural significance…"></textarea>
                         @error('description') <p class="form-error">{{ $message }}</p> @enderror
@@ -166,13 +166,13 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Region <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
+                            <label class="form-label">Region</label>
                             <input wire:model="region" type="text" placeholder="e.g. Cordillera Administrative Region"
                                    class="form-input" />
                             @error('region') <p class="form-error">{{ $message }}</p> @enderror
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Origin <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
+                            <label class="form-label">Origin</label>
                             <input wire:model="origin" type="text" placeholder="e.g. Ifugao Province"
                                    class="form-input" />
                             @error('origin') <p class="form-error">{{ $message }}</p> @enderror
@@ -181,14 +181,14 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Cultural Meaning <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
+                            <label class="form-label">Cultural Meaning</label>
                             <textarea wire:model="cultural_meaning" class="form-input"
                                       placeholder="What this dance represents within the community…" style="min-height:80px;"></textarea>
                             @error('cultural_meaning') <p class="form-error">{{ $message }}</p> @enderror
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Historical Background <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
+                            <label class="form-label">Historical Background</label>
                             <textarea wire:model="historical_background" class="form-input"
                                       placeholder="Origins, traditions, and how it has been passed down…" style="min-height:80px;"></textarea>
                             @error('historical_background') <p class="form-error">{{ $message }}</p> @enderror
@@ -196,7 +196,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">YouTube URL <span style="font-weight:400;color:var(--gray-lt);">(optional)</span></label>
+                        <label class="form-label">YouTube URL</label>
                         <input wire:model.live.debounce.500ms="video_url" type="url" placeholder="https://www.youtube.com/watch?v=…"
                                class="form-input {{ $errors->has('video_url') ? 'error' : '' }}" />
                         @error('video_url') <p class="form-error">{{ $message }}</p> @enderror
@@ -214,7 +214,7 @@
 
                     <div class="form-row">
                         <div class="form-group" x-data="{ videoPct: 0 }">
-                            <label class="form-label">Upload Video <span style="font-weight:400;color:var(--gray-lt);">(optional — MP4/MOV/WebM, max 50 MB)</span></label>
+                            <label class="form-label">Upload Video</label>
                             @if($video && $video->isPreviewable())
                                 <div style="position:relative;margin-bottom:.5rem;">
                                     <video src="{{ $video->temporaryUrl() }}" controls preload="metadata"
@@ -272,9 +272,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">
-                                {{ $isEditing ? 'Replace Image (optional)' : 'Dance Image (optional)' }}
-                            </label>
+                            <label class="form-label">{{ $isEditing ? 'Replace Image' : 'Dance Image' }}</label>
                             @if($image && $image->isPreviewable())
                                 <div style="position:relative;margin-bottom:.5rem;width:100px;">
                                     <img src="{{ $image->temporaryUrl() }}" style="width:100px;height:100px;object-fit:cover;border-radius:.5rem;" />
