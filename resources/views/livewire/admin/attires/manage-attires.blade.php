@@ -190,29 +190,6 @@
                         @error('description') <p class="form-error">{{ $message }}</p> @enderror
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Fabric / Material</label>
-                            <input wire:model="material" type="text" placeholder="e.g. Handwoven cotton, ikat-dyed threads"
-                                   class="form-input" />
-                            @error('material') <p class="form-error">{{ $message }}</p> @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Source / Reference</label>
-                            <input wire:model="source_info" type="text" placeholder="e.g. National Museum of the Philippines"
-                                   class="form-input" />
-                            @error('source_info') <p class="form-error">{{ $message }}</p> @enderror
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Cultural Significance</label>
-                        <textarea wire:model="cultural_significance" class="form-input"
-                                  placeholder="The meaning, rituals, or status this attire conveys…" style="min-height:80px;"></textarea>
-                        @error('cultural_significance') <p class="form-error">{{ $message }}</p> @enderror
-                    </div>
-
                     <div class="form-group">
                         <label class="form-label">{{ $isEditing ? 'Replace Image' : 'Attire Image' }}</label>
                         @if($image && $image->isPreviewable())

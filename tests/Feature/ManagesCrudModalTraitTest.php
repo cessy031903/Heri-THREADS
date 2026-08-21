@@ -51,7 +51,8 @@ class ManagesCrudModalTraitTest extends TestCase
             ->call('openEdit', $attire->id)
             ->set('name_general', 'Test Attire Updated')
             ->set('image', $img2)
-            ->call('save');
+            ->call('save')
+            ->assertDispatched('toast', message: 'Updated Successfully');
 
         $attire->refresh();
         $this->assertSame('Test Attire Updated', $attire->name_general);
@@ -85,7 +86,8 @@ class ManagesCrudModalTraitTest extends TestCase
             ->call('openEdit', $dance->id)
             ->set('name', 'Test Dance Updated')
             ->set('image', $img2)
-            ->call('save');
+            ->call('save')
+            ->assertDispatched('toast', message: 'Updated Successfully');
 
         $dance->refresh();
         $this->assertSame('Test Dance Updated', $dance->name);

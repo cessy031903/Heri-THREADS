@@ -199,7 +199,7 @@ class ManageGuides extends Component
         }
 
         AuditLog::record($this->isEditing ? 'update' : 'create', 'guide', $guide->id, $guide->title);
-        $this->dispatch('toast', message: "Guide \"{$guide->title}\" saved.", type: 'success');
+        $this->dispatch('toast', message: $this->isEditing ? 'Updated Successfully' : "Guide \"{$guide->title}\" added.", type: 'success');
 
         $this->showModal = false;
         $this->resetForm();

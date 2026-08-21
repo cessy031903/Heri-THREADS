@@ -9,6 +9,10 @@ Route::get('/attires', \App\Livewire\ExploreAttires::class)->name('attires');
 
 // Auth
 Route::get('/login', \App\Livewire\Auth\Login::class)->name('login')->middleware('guest')->middleware('throttle:10,1');
+Route::get('/forgot-password', \App\Livewire\Auth\ForgotPassword::class)
+    ->name('password.request')->middleware('guest')->middleware('throttle:5,1');
+Route::get('/reset-password/{token}', \App\Livewire\Auth\ResetPassword::class)
+    ->name('password.reset')->middleware('guest');
 Route::post('/logout', function () {
     auth()->logout();
     request()->session()->invalidate();

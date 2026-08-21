@@ -44,6 +44,13 @@ trait ManagesCrudModal
     private function logAndNotify(string $action, string $type, int $id, string $subject, string $verb): void
     {
         AuditLog::record($action, $type, $id, $subject);
-        $this->dispatch('toast', message: "\"{$subject}\" {$verb}.", type: 'success');
+
+        // "Updated Successfully" is the client-specified wording for edits;
+        // create/delete keep the more descriptive "<name> added/deleted."
+        $message = $action === 'update'
+            ? 'Updated Successfully'
+            : "\"{$subject}\" {$verb}.";
+
+        $this->dispatch('toast', message: $message, type: 'success');
     }
 }

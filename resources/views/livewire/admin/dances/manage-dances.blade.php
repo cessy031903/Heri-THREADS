@@ -164,37 +164,6 @@
                         @error('description') <p class="form-error">{{ $message }}</p> @enderror
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Region</label>
-                            <input wire:model="region" type="text" placeholder="e.g. Cordillera Administrative Region"
-                                   class="form-input" />
-                            @error('region') <p class="form-error">{{ $message }}</p> @enderror
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Origin</label>
-                            <input wire:model="origin" type="text" placeholder="e.g. Ifugao Province"
-                                   class="form-input" />
-                            @error('origin') <p class="form-error">{{ $message }}</p> @enderror
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Cultural Meaning</label>
-                            <textarea wire:model="cultural_meaning" class="form-input"
-                                      placeholder="What this dance represents within the community…" style="min-height:80px;"></textarea>
-                            @error('cultural_meaning') <p class="form-error">{{ $message }}</p> @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Historical Background</label>
-                            <textarea wire:model="historical_background" class="form-input"
-                                      placeholder="Origins, traditions, and how it has been passed down…" style="min-height:80px;"></textarea>
-                            @error('historical_background') <p class="form-error">{{ $message }}</p> @enderror
-                        </div>
-                    </div>
-
                     <div class="form-group">
                         <label class="form-label">YouTube URL</label>
                         <input wire:model.live.debounce.500ms="video_url" type="url" placeholder="https://www.youtube.com/watch?v=…"

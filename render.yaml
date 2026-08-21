@@ -63,23 +63,25 @@ services:
         value: database
       - key: FILESYSTEM_DISK
         value: public
-      # Free web service plan has no persistent disk, so the "public" disk
-      # is backed by Cloudflare R2 (S3-compatible) instead of local storage.
-      # Create a free R2 bucket + API token in the Cloudflare dashboard and
-      # fill these in on the Render dashboard (they are not committed here).
-      - key: PUBLIC_DISK_DRIVER
-        value: s3
-      - key: AWS_ACCESS_KEY_ID
-        sync: false
-      - key: AWS_SECRET_ACCESS_KEY
-        sync: false
-      - key: AWS_DEFAULT_REGION
-        value: auto
-      - key: AWS_BUCKET
-        sync: false
-      - key: AWS_ENDPOINT
-        sync: false
-      - key: AWS_USE_PATH_STYLE_ENDPOINT
-        value: true
-      - key: PUBLIC_DISK_URL
-        sync: false
+      # Free web service plan has no persistent disk. Uploaded files are
+      # written to local disk (default driver) for now, which means they
+      # are WIPED on every redeploy/restart of the free web service — a
+      # known, accepted tradeoff of staying fully free (no R2/S3 card).
+      # To fix later: set PUBLIC_DISK_DRIVER=s3 plus the AWS_* vars below
+      # (Cloudflare R2 free tier) on the Render dashboard, uncommented here.
+      # - key: PUBLIC_DISK_DRIVER
+      #   value: s3
+      # - key: AWS_ACCESS_KEY_ID
+      #   sync: false
+      # - key: AWS_SECRET_ACCESS_KEY
+      #   sync: false
+      # - key: AWS_DEFAULT_REGION
+      #   value: auto
+      # - key: AWS_BUCKET
+      #   sync: false
+      # - key: AWS_ENDPOINT
+      #   sync: false
+      # - key: AWS_USE_PATH_STYLE_ENDPOINT
+      #   value: true
+      # - key: PUBLIC_DISK_URL
+      #   sync: false
