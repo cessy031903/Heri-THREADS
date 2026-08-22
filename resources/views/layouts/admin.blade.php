@@ -93,6 +93,65 @@
                 Home Showcase
             </a>
 
+            <div class="sb-section" style="margin-top:.875rem;">Settings</div>
+
+            <a href="{{ route('admin.settings.accounts') }}" wire:navigate
+               class="sb-item {{ request()->routeIs('admin.settings.accounts') ? 'active' : '' }}"
+               @click="sidebarOpen = false">
+                <span class="ico">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                </span>
+                Manage Accounts
+            </a>
+
+            <a href="{{ route('admin.settings.database') }}" wire:navigate
+               class="sb-item {{ request()->routeIs('admin.settings.database') ? 'active' : '' }}"
+               @click="sidebarOpen = false">
+                <span class="ico">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7c0-1.66 3.58-3 8-3s8 1.34 8 3-3.58 3-8 3-8-1.34-8-3zm0 0v10c0 1.66 3.58 3 8 3s8-1.34 8-3V7M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/>
+                    </svg>
+                </span>
+                Manage Database
+            </a>
+
+            <div class="sb-section" style="margin-top:.875rem;">About</div>
+
+            <a href="{{ route('admin.about') }}" wire:navigate
+               class="sb-item {{ request()->routeIs('admin.about') ? 'active' : '' }}"
+               @click="sidebarOpen = false">
+                <span class="ico">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="9"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 16v-4m0-4h.01"/>
+                    </svg>
+                </span>
+                About
+            </a>
+
+            <a href="{{ route('admin.help') }}" wire:navigate
+               class="sb-item {{ request()->routeIs('admin.help') ? 'active' : '' }}"
+               @click="sidebarOpen = false">
+                <span class="ico">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="9"/><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 9a2.5 2.5 0 015 0c0 1.5-2.5 2-2.5 3.5m0 3h.01"/>
+                    </svg>
+                </span>
+                Help
+            </a>
+
+            <a href="{{ route('admin.developer') }}" wire:navigate
+               class="sb-item {{ request()->routeIs('admin.developer') ? 'active' : '' }}"
+               @click="sidebarOpen = false">
+                <span class="ico">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 18l6-6-6-6M8 6l-6 6 6 6"/>
+                    </svg>
+                </span>
+                Developer
+            </a>
+
             <div class="sb-section" style="margin-top:.875rem;">Site</div>
 
             <a href="{{ route('home') }}" target="_blank" class="sb-item" @click="sidebarOpen = false">

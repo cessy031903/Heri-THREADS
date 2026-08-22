@@ -30,6 +30,10 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            // Every real admin account has role=admin (checked by
+            // AdminMiddleware::isAdmin()); default it here too so factory
+            // users pass that check without every test having to set it.
+            'role' => 'admin',
         ];
     }
 

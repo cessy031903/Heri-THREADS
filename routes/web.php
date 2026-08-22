@@ -28,4 +28,11 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/attires',   \App\Livewire\Admin\Attires\ManageAttires::class)->name('attires');
     Route::get('/guides',    \App\Livewire\Admin\Guides\ManageGuides::class)->name('guides');
     Route::get('/showcase',  \App\Livewire\Admin\Showcase\ManageShowcase::class)->name('showcase');
+
+    Route::get('/settings/accounts', \App\Livewire\Admin\Settings\ManageAccounts::class)->name('settings.accounts');
+    Route::get('/settings/database', \App\Livewire\Admin\Settings\ManageDatabase::class)->name('settings.database');
+
+    Route::get('/about',      \App\Livewire\Admin\About\AboutPage::class)->name('about');
+    Route::get('/help',       \App\Livewire\Admin\About\HelpPage::class)->name('help');
+    Route::get('/developer',  \App\Livewire\Admin\About\DeveloperPage::class)->name('developer');
 });

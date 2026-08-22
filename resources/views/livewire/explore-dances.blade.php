@@ -142,7 +142,6 @@
         [$md, $ml] = \App\Support\PlaceholderPalette::visitor($dance->id + 10);
         $mCatColors = ['vb-pagaddut', 'vb-hinggatut', 'vb-dinuya'];
         $mCatKey = $mCatColors[abs(crc32((string) $dance->category)) % count($mCatColors)];
-        $tagline = collect([$dance->region, $dance->origin])->filter()->implode(' · ');
         $danceImgUrl = $dance->image_path ? Storage::disk('public')->url($dance->image_path) : null;
     @endphp
     <div class="vis-modal-ov" wire:click.self="closeModal()"
@@ -165,11 +164,8 @@
                     <button type="button" class="vis-close-btn" wire:click="closeModal()" aria-label="Close">✕</button>
                 </x-slot:actions>
                 <div class="dmodal-hero-text">
-                    <span class="vis-badge {{ $mCatKey }}">{{ $dance->municipality ?? $dance->category }}</span>
+                    <span class="vis-badge {{ $mCatKey }}">{{ ucfirst($dance->category) }}</span>
                     <h2 class="dmodal-title">{{ $dance->name }}</h2>
-                    @if($tagline)
-                        <p class="dmodal-tagline">{{ $tagline }}</p>
-                    @endif
                 </div>
             </x-visitor.modal-hero>
 
@@ -179,19 +175,6 @@
                 <div class="dmodal-details">
                     <div class="dmodal-main">
                         <p class="dmodal-desc">{{ $dance->description }}</p>
-
-                        @if($dance->cultural_meaning)
-                            <div class="dmodal-block">
-                                <h3 class="dmodal-block-title">Cultural Meaning</h3>
-                                <p class="dmodal-block-text">{{ $dance->cultural_meaning }}</p>
-                            </div>
-                        @endif
-                        @if($dance->historical_background)
-                            <div class="dmodal-block">
-                                <h3 class="dmodal-block-title">Historical Background</h3>
-                                <p class="dmodal-block-text">{{ $dance->historical_background }}</p>
-                            </div>
-                        @endif
                     </div>
 
                     <aside class="dmodal-meta">
@@ -199,18 +182,6 @@
                             <span class="meta-label">Category</span>
                             <span class="meta-value">{{ ucfirst($dance->category) }}</span>
                         </div>
-                        @if($dance->region)
-                            <div class="meta-card">
-                                <span class="meta-label">Region</span>
-                                <span class="meta-value">{{ $dance->region }}</span>
-                            </div>
-                        @endif
-                        @if($dance->origin)
-                            <div class="meta-card">
-                                <span class="meta-label">Origin</span>
-                                <span class="meta-value">{{ $dance->origin }}</span>
-                            </div>
-                        @endif
                     </aside>
                 </div>
 

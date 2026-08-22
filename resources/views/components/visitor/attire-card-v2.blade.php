@@ -13,12 +13,7 @@
          wire:key="att-{{ $attire->id }}"
          role="button" tabindex="0"
          aria-label="View {{ $attire->name_general }}">
-    <div style="position:absolute;inset:0;background:linear-gradient(148deg,{{ $ad }} 0%,{{ $al }} 100%);">
-        <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 80 80" preserveAspectRatio="xMidYMid slice">
-            <defs><pattern id="apt{{ $attire->id }}" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><polygon points="10,1 19,10 10,19 1,10" fill="none" stroke="white" stroke-width="1.3" opacity="0.09"/><circle cx="10" cy="10" r="1.8" fill="white" opacity="0.063"/><line x1="0" y1="10" x2="20" y2="10" stroke="white" stroke-width=".35" opacity="0.036"/><line x1="10" y1="0" x2="10" y2="20" stroke="white" stroke-width=".35" opacity="0.036"/></pattern></defs>
-            <rect width="80" height="80" fill="url(#apt{{ $attire->id }})"/>
-        </svg>
-    </div>
+    <div style="position:absolute;inset:0;background:linear-gradient(148deg,{{ $ad }} 0%,{{ $al }} 100%);"></div>
     @if($attire->image_path)
         @php $attireCardImg = Storage::disk('public')->url($attire->image_path); @endphp
         <img src="{{ $attireCardImg }}"

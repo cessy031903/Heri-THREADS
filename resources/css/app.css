@@ -1740,12 +1740,14 @@ body.heri-surface .mob-nav {
   padding-top: 0.5rem;
 }
 .attire-grid-v2 {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 320px));
+  justify-content: start;
   padding: 0 0 0.5rem;
   max-width: none;
   margin: 0;
 }
 @media(max-width:600px) {
-  .attire-grid-v2 { padding: 0 0 0.5rem; }
+  .attire-grid-v2 { grid-template-columns: 1fr; padding: 0 0 0.5rem; }
 }
 
 /* ── INTERACTIVE GUIDE / PAIRED HOTSPOTS ─────────────────────── */

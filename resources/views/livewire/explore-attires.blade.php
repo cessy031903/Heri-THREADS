@@ -255,12 +255,6 @@
                             <span class="meta-label">Municipality</span>
                             <span class="meta-value">{{ $attire->municipality }}</span>
                         </div>
-                        @if($attire->material)
-                            <div class="meta-card">
-                                <span class="meta-label">Fabric / Material</span>
-                                <span class="meta-value">{{ $attire->material }}</span>
-                            </div>
-                        @endif
                         @if($attire->source_info)
                             <div class="meta-card">
                                 <span class="meta-label">Source</span>

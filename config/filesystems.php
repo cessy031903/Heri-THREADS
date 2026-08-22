@@ -33,7 +33,11 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // Deliberately not served over HTTP — this disk holds private
+            // content (e.g. database backups written by ManageDatabase),
+            // and both this disk and "public" defaulting to /storage would
+            // otherwise collide when the public disk's fallback is enabled.
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],
@@ -45,6 +49,13 @@ return [
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
+
+            // Fallback for hosts where `php artisan storage:link`'s symlink
+            // doesn't work (some shared hosts, e.g. certain Hostinger
+            // plans, restrict symlinks) — serves files directly through
+            // Laravel instead of relying on the symlink. Off by default:
+            // the real symlink is faster since it skips PHP entirely.
+            'serve' => env('STORAGE_LINK_FALLBACK', false),
 
             // S3-compatible (e.g. Cloudflare R2) settings, used when
             // PUBLIC_DISK_DRIVER=s3. Ignored by the local driver.
